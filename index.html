@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>E-Musical Shopping | Nigeria's No.1 Musical Instrument Store</title>
+
+<script src="https://cdn.tailwindcss.com"></script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"/>
+
+<script>
+tailwind.config={
+theme:{
+extend:{
+colors:{
+primary:"#0047AB",
+secondary:"#111827"
+}
+}
+}
+}
+</script>
+
+<style>
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:'Poppins',sans-serif;
+scroll-behavior:smooth;
+}
+body{
+background:#f5f5f5;
+}
+.product{
+position:relative;
+}
+.product:hover{
+transform:translateY(-8px);
+transition:.3s;
+box-shadow:0 15px 35px rgba(0,0,0,.15);
+}
+.product img{
+display:block;
+}
+.menu:hover{
+color:#0047AB;
+}
+#cart-modal .cart-panel{
+animation:slideIn .25s ease-out;
+}
+@keyframes slideIn{
+from{transform:translateX(100%);}
+to{transform:translateX(0);}
+}
+</style>
+
+</head>
+
+<body>
+
+<!-- TOP BAR -->
+<div class="bg-blue-900 text-white text-sm">
+<div class="max-w-7xl mx-auto flex justify-between items-center px-5 py-2">
+<div class="flex gap-5">
+<p><i class="fa-solid fa-phone"></i> 08122321064</p>
+<p><i class="fa-solid fa-envelope"></i> emusic20official@gmail.com</p>
+</div>
+<div class="hidden md:flex gap-6">
+<a href="#" class="hover:text-yellow-300">Track Order</a>
+<a href="#" class="hover:text-yellow-300">Customer Support</a>
+<a href="#" class="hover:text-yellow-300">Login</a>
+<a href="#" class="hover:text-yellow-300">Register</a>
+</div>
+</div>
+</div>
+
+<!-- NAVIGATION -->
+<header class="bg-white shadow sticky top-0 z-50">
+<div class="max-w-7xl mx-auto px-5 py-4 flex items-center justify-between">
+<div class="flex items-center gap-3">
+<img src="https://cdn-icons-png.flaticon.com/512/3659/3659899.png" class="w-14 h-14">
+<div>
+<h1 class="text-3xl font-bold text-blue-900">E-Musical Shopping</h1>
+<p class="text-xs text-gray-500">Your One-Stop Shop For Musical Instruments</p>
+</div>
+</div>
+
+<nav class="hidden lg:flex gap-8 font-medium">
+<a href="#" class="menu">Home</a>
+<a href="#" class="menu">Shop</a>
+<a href="#" class="menu">Categories</a>
+<a href="#" class="menu">Flash Sale</a>
+<a href="#" class="menu">About</a>
+<a href="#contact" class="menu">Contact</a>
+</nav>
+
+<div class="flex items-center gap-5">
+<button>
+<i class="fa-regular fa-heart text-2xl"></i>
+</button>
+<button class="relative" onclick="openCart()">
+<i class="fa-solid fa-cart-shopping text-2xl"></i>
+<span id="cart-count" class="absolute -top-2 -right-2 bg-red-600 text-white text-xs rounded-full w-5 h-5 flex justify-center items-center">0</span>
+</button>
+<button class="lg:hidden">
+<i class="fa-solid fa-bars text-2xl"></i>
+</button>
+</div>
+</div>
+
+<!-- SEARCH BAR -->
+<div class="bg-gray-100 border-t">
+<div class="max-w-7xl mx-auto px-5 py-4">
+<div class="flex">
+<input type="search" placeholder="Search for Pianos, Guitars, Speakers, Mixers..." class="w-full rounded-l-lg border p-4 outline-none">
+<button class="bg-blue-800 text-white px-8 rounded-r-lg hover:bg-black">
+<i class="fa-solid fa-magnifying-glass"></i> Search
+</button>
+</div>
+</div>
+</div>
+</header>
+
+<!-- ================= HERO SECTION ================= -->
+<section class="bg-gray-100 py-8">
+<div class="max-w-7xl mx-auto px-5">
+<div class="grid lg:grid-cols-4 gap-6">
+
+<!-- CATEGORY SIDEBAR -->
+<div class="bg-white rounded-xl shadow-lg overflow-hidden">
+<div class="bg-blue-900 text-white p-4">
+<h2 class="text-xl font-bold"><i class="fa-solid fa-list mr-2"></i>Browse Categories</h2>
+</div>
+<ul class="divide-y">
+<li class="p-4 hover:bg-gray-100 cursor-pointer">🎹 Pianos</li>
+<li class="p-4 hover:bg-gray-100 cursor-pointer">⌨️ Keyboards</li>
+<li class="p-4 hover:bg-gray-100 cursor-pointer">🎸 Acoustic Guitars</li>
+<li class="p-4 hover:bg-gray-100 cursor-pointer">🎸 Electric Guitars</li>
+<li class="p-4 hover:bg-gray-100 cursor-pointer">🎸 Bass Guitars</li>
+<li class="p-4 hover:bg-gray-100 cursor-pointer">🥁 Drums</li>
+<li class="p-4 hover:bg-gray-100 cursor-pointer">🎷 Saxophones</li>
+<li class="p-4 hover:bg-gray-100 cursor-pointer">🎺 Trumpets</li>
+<li class="p-4 hover:bg-gray-100 cursor-pointer">🎻 Violins</li>
+<li class="p-4 hover:bg-gray-100 cursor-pointer">🎤 Microphones</li>
+<li class="p-4 hover:bg-gray-100 cursor-pointer">🔊 Speakers</li>
+<li class="p-4 hover:bg-gray-100 cursor-pointer">🎚️ Mixers</li>
+<li class="p-4 hover:bg-gray-100 cursor-pointer">🎧 Studio Equipment</li>
+<li class="p-4 hover:bg-gray-100 cursor-pointer">🛍 Accessories</li>
+</ul>
+</div>
+
+<!-- MAIN BANNER -->
+<div class="lg:col-span-2 bg-gradient-to-r from-blue-900 to-blue-600 rounded-xl overflow-hidden shadow-lg">
+<div class="grid md:grid-cols-2 items-center">
+<div class="p-10 text-white">
+<span class="bg-yellow-400 text-black px-4 py-1 rounded-full text-sm font-semibold">NEW ARRIVALS</span>
+<h1 class="text-5xl font-bold mt-6">Premium Musical Instruments</h1>
+<p class="mt-6 text-lg">Discover genuine keyboards, pianos, guitars, drums, studio equipment and professional audio systems at unbeatable prices.</p>
+<div class="mt-8">
+<a href="#products" class="bg-white text-blue-900 px-8 py-4 rounded-lg font-bold hover:bg-yellow-300 transition">Shop Now</a>
+</div>
+</div>
+<div class="h-full">
+<img src="https://images.unsplash.com/photo-1511379938547-c1f69419868d?w=900" class="w-full h-full object-cover" alt="Musical Instruments">
+</div>
+</div>
+</div>
+
+<!-- RIGHT PROMOTIONS -->
+<div class="space-y-6">
+<div class="bg-white rounded-xl shadow-lg p-6">
+<h3 class="text-xl font-bold text-blue-900">🔥 Flash Sale</h3>
+<p class="text-gray-600 mt-3">Up to <span class="font-bold text-red-600">30% OFF</span> selected musical instruments.</p>
+<a href="#products" class="inline-block mt-4 text-blue-700 font-semibold">Shop Deals →</a>
+</div>
+<div class="bg-black text-white rounded-xl shadow-lg p-6">
+<h3 class="text-xl font-bold">🚚 Nationwide Delivery</h3>
+<p class="mt-3 text-gray-300">Fast and secure delivery to all 36 states in Nigeria.</p>
+</div>
+<div class="bg-yellow-400 rounded-xl shadow-lg p-6">
+<h3 class="text-xl font-bold">💳 Secure Payment</h3>
+<p class="mt-3">Pay safely via Bank Transfer, POS or Cash.</p>
+</div>
+</div>
+
+</div>
+</div>
+</section>
+
+<!-- ================= FEATURES ================= -->
+<section class="py-10 bg-white">
+<div class="max-w-7xl mx-auto px-5">
+<div class="grid md:grid-cols-4 gap-6">
+<div class="flex items-center gap-4 bg-gray-50 p-5 rounded-xl shadow">
+<i class="fa-solid fa-truck text-4xl text-blue-800"></i>
+<div><h4 class="font-bold">Nationwide Delivery</h4><p class="text-sm text-gray-500">Anywhere in Nigeria</p></div>
+</div>
+<div class="flex items-center gap-4 bg-gray-50 p-5 rounded-xl shadow">
+<i class="fa-solid fa-award text-4xl text-blue-800"></i>
+<div><h4 class="font-bold">100% Genuine</h4><p class="text-sm text-gray-500">Trusted Brands</p></div>
+</div>
+<div class="flex items-center gap-4 bg-gray-50 p-5 rounded-xl shadow">
+<i class="fa-solid fa-headset text-4xl text-blue-800"></i>
+<div><h4 class="font-bold">24/7 Support</h4><p class="text-sm text-gray-500">Customer Assistance</p></div>
+</div>
+<div class="flex items-center gap-4 bg-gray-50 p-5 rounded-xl shadow">
+<i class="fa-solid fa-credit-card text-4xl text-blue-800"></i>
+<div><h4 class="font-bold">Secure Payment</h4><p class="text-sm text-gray-500">Safe Transactions</p></div>
+</div>
+</div>
+</div>
+</section>
+
+<!-- ================= FLASH SALE ================= -->
+<section id="products" class="py-12 bg-gray-100">
+<div class="max-w-7xl mx-auto px-5">
+
+<div class="flex justify-between items-center mb-8">
+<div>
+<h2 class="text-3xl font-bold text-gray-800">🔥 Flash Sale</h2>
+<p class="text-gray-500">Limited-time discounts on selected products</p>
+</div>
+<a href="#" class="text-blue-700 font-semibold">View All →</a>
+</div>
+
+<div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
+
+<div class="product bg-white rounded-xl shadow overflow-hidden"
+data-id="1" data-name="Yamaha PSR-E373 Keyboard" data-price="395000"
+data-img="https://images.unsplash.com/photo-1514119412350-e174d90d280e?w=600">
+<span class="absolute top-2 left-2 z-10 bg-red-600 text-white text-xs px-2 py-1 rounded-lg">-15%</span>
+<img src="https://images.unsplash.com/photo-1514119412350-e174d90d280e?w=600" class="w-full h-48 object-cover">
+<div class="p-4">
+<h3 class="font-semibold">Yamaha PSR-E373 Keyboard</h3>
+<p class="text-blue-700 font-bold text-xl mt-2">₦395,000</p>
+<p class="text-sm line-through text-gray-400">₦465,000</p>
+<div class="text-yellow-500 mt-2">★★★★★</div>
+<button onclick="addToCart(event)" class="mt-4 w-full bg-blue-800 text-white py-2 rounded-lg hover:bg-black">Add to Cart</button>
+</div>
+</div>
+
+<div class="product bg-white rounded-xl shadow overflow-hidden"
+data-id="2" data-name="Roland FP-10 Digital Piano" data-price="1680000"
+data-img="https://images.unsplash.com/photo-1510915361894-db8b60106cb1?w=600">
+<img src="https://images.unsplash.com/photo-1510915361894-db8b60106cb1?w=600" class="w-full h-48 object-cover">
+<div class="p-4">
+<h3 class="font-semibold">Roland FP-10 Digital Piano</h3>
+<p class="text-blue-700 font-bold text-xl mt-2">₦1,680,000</p>
+<p class="text-sm line-through text-gray-400">₦1,820,000</p>
+<div class="text-yellow-500 mt-2">★★★★★</div>
+<button onclick="addToCart(event)" class="mt-4 w-full bg-blue-800 text-white py-2 rounded-lg hover:bg-black">Add to Cart</button>
+</div>
+</div>
+
+<div class="product bg-white rounded-xl shadow overflow-hidden"
+data-id="3" data-name="Fender Electric Guitar" data-price="980000"
+data-img="https://images.unsplash.com/photo-1519892300165-cb5542fb47c7?w=600">
+<img src="https://images.unsplash.com/photo-1519892300165-cb5542fb47c7?w=600" class="w-full h-48 object-cover">
+<div class="p-4">
+<h3 class="font-semibold">Fender Electric Guitar</h3>
+<p class="text-blue-700 font-bold text-xl">₦980,000</p>
+<p class="text-sm line-through text-gray-400">₦1,120,000</p>
+<div class="text-yellow-500">★★★★★</div>
+<button onclick="addToCart(event)" class="mt-4 w-full bg-blue-800 text-white py-2 rounded-lg hover:bg-black">Add to Cart</button>
+</div>
+</div>
+
+<div class="product bg-white rounded-xl shadow overflow-hidden"
+data-id="4" data-name="Pearl Drum Set" data-price="1450000"
+data-img="https://images.unsplash.com/photo-1516280440614-37939bbacd81?w=600">
+<img src="https://images.unsplash.com/photo-1516280440614-37939bbacd81?w=600" class="w-full h-48 object-cover">
+<div class="p-4">
+<h3 class="font-semibold">Pearl Drum Set</h3>
+<p class="text-blue-700 font-bold text-xl">₦1,450,000</p>
+<p class="text-sm line-through text-gray-400">₦1,650,000</p>
+<div class="text-yellow-500">★★★★★</div>
+<button onclick="addToCart(event)" class="mt-4 w-full bg-blue-800 text-white py-2 rounded-lg hover:bg-black">Add to Cart</button>
+</div>
+</div>
+
+<div class="product bg-white rounded-xl shadow overflow-hidden"
+data-id="5" data-name="Ibanez Bass Guitar" data-price="760000"
+data-img="https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=600">
+<img src="https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=600" class="w-full h-48 object-cover">
+<div class="p-4">
+<h3 class="font-semibold">Ibanez Bass Guitar</h3>
+<p class="text-blue-700 font-bold text-xl">₦760,000</p>
+<p class="text-sm line-through text-gray-400">₦850,000</p>
+<div class="text-yellow-500">★★★★★</div>
+<button onclick="addToCart(event)" class="mt-4 w-full bg-blue-800 text-white py-2 rounded-lg hover:bg-black">Add to Cart</button>
+</div>
+</div>
+
+</div>
+</div>
+</section>
+
+<!-- ================= FEATURED PRODUCTS ================= -->
+<section class="py-16 bg-white">
+<div class="max-w-7xl mx-auto px-5">
+<div class="flex justify-between items-center mb-10">
+<h2 class="text-3xl font-bold">⭐ Featured Products</h2>
+<a href="#" class="text-blue-700 font-semibold">Browse All →</a>
+</div>
+
+<div class="grid md:grid-cols-4 gap-6">
+
+<div class="product bg-white rounded-xl shadow p-5"
+data-id="6" data-name="Behringer Mixer X1204USB" data-price="290000"
+data-img="https://images.unsplash.com/photo-1507838153414-b4b713384a76?w=600">
+<img src="https://images.unsplash.com/photo-1507838153414-b4b713384a76?w=600" class="rounded-lg h-52 w-full object-cover">
+<h3 class="font-semibold mt-4">Behringer Mixer X1204USB</h3>
+<p class="text-blue-700 font-bold text-xl mt-2">₦290,000</p>
+<button onclick="addToCart(event)" class="mt-4 w-full bg-blue-800 text-white py-2 rounded-lg">Buy Now</button>
+</div>
+
+<div class="product bg-white rounded-xl shadow p-5"
+data-id="7" data-name="Studio Headphones" data-price="85000"
+data-img="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=600">
+<img src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=600" class="rounded-lg h-52 w-full object-cover">
+<h3 class="font-semibold mt-4">Studio Headphones</h3>
+<p class="text-blue-700 font-bold text-xl">₦85,000</p>
+<button onclick="addToCart(event)" class="mt-4 w-full bg-blue-800 text-white py-2 rounded-lg">Buy Now</button>
+</div>
+
+<div class="product bg-white rounded-xl shadow p-5"
+data-id="8" data-name="Shure SM58 Microphone" data-price="210000"
+data-img="https://images.unsplash.com/photo-1465821185615-20b3c2fbf41b?w=600">
+<img src="https://images.unsplash.com/photo-1465821185615-20b3c2fbf41b?w=600" class="rounded-lg h-52 w-full object-cover">
+<h3 class="font-semibold mt-4">Shure SM58 Microphone</h3>
+<p class="text-blue-700 font-bold text-xl">₦210,000</p>
+<button onclick="addToCart(event)" class="mt-4 w-full bg-blue-800 text-white py-2 rounded-lg">Buy Now</button>
+</div>
+
+<div class="product bg-white rounded-xl shadow p-5"
+data-id="9" data-name="JBL Professional Speaker" data-price="670000"
+data-img="https://images.unsplash.com/photo-1608043152269-423dbba4e7e1?w=600">
+<img src="https://images.unsplash.com/photo-1608043152269-423dbba4e7e1?w=600" class="rounded-lg h-52 w-full object-cover">
+<h3 class="font-semibold mt-4">JBL Professional Speaker</h3>
+<p class="text-blue-700 font-bold text-xl">₦670,000</p>
+<button onclick="addToCart(event)" class="mt-4 w-full bg-blue-800 text-white py-2 rounded-lg">Buy Now</button>
+</div>
+
+</div>
+</div>
+</section>
+
+<!-- ================= BEST SELLERS ================= -->
+<section class="py-16 bg-gray-100">
+<div class="max-w-7xl mx-auto px-5">
+
+<div class="flex justify-between items-center mb-10">
+<div>
+<h2 class="text-3xl font-bold">🔥 Best Sellers</h2>
+<p class="text-gray-500">Most purchased musical instruments this month</p>
+</div>
+<a href="#" class="text-blue-700 font-semibold">See More →</a>
+</div>
+
+<div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+
+<div class="product bg-white rounded-xl shadow-lg overflow-hidden"
+data-id="10" data-name="Yamaha P-145 Digital Piano" data-price="1250000"
+data-img="https://images.unsplash.com/photo-1511379938547-c1f69419868d?w=700">
+<img src="https://images.unsplash.com/photo-1511379938547-c1f69419868d?w=700" class="w-full h-56 object-cover">
+<div class="p-5">
+<span class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs">BEST SELLER</span>
+<h3 class="font-bold mt-3">Yamaha P-145 Digital Piano</h3>
+<p class="text-blue-800 font-bold text-2xl mt-2">₦1,250,000</p>
+<div class="text-yellow-500 mt-2">★★★★★ (124)</div>
+<button onclick="addToCart(event)" class="w-full bg-blue-800 text-white py-3 rounded-lg mt-5 hover:bg-black">Add to Cart</button>
+</div>
+</div>
+
+<div class="product bg-white rounded-xl shadow-lg overflow-hidden"
+data-id="11" data-name="Electric Bass Guitar" data-price="760000"
+data-img="https://images.unsplash.com/photo-1519892300165-cb5542fb47c7?w=700">
+<img src="https://images.unsplash.com/photo-1519892300165-cb5542fb47c7?w=700" class="w-full h-56 object-cover">
+<div class="p-5">
+<span class="bg-red-100 text-red-700 px-3 py-1 rounded-full text-xs">HOT DEAL</span>
+<h3 class="font-bold mt-3">Electric Bass Guitar</h3>
+<p class="text-blue-800 font-bold text-2xl mt-2">₦760,000</p>
+<div class="text-yellow-500 mt-2">★★★★★ (95)</div>
+<button onclick="addToCart(event)" class="w-full bg-blue-800 text-white py-3 rounded-lg mt-5 hover:bg-black">Add to Cart</button>
+</div>
+</div>
+
+<div class="product bg-white rounded-xl shadow-lg overflow-hidden"
+data-id="12" data-name="Professional Drum Set" data-price="1450000"
+data-img="https://images.unsplash.com/photo-1516280440614-37939bbacd81?w=700">
+<img src="https://images.unsplash.com/photo-1516280440614-37939bbacd81?w=700" class="w-full h-56 object-cover">
+<div class="p-5">
+<span class="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-xs">NEW</span>
+<h3 class="font-bold mt-3">Professional Drum Set</h3>
+<p class="text-blue-800 font-bold text-2xl mt-2">₦1,450,000</p>
+<div class="text-yellow-500 mt-2">★★★★★ (87)</div>
+<button onclick="addToCart(event)" class="w-full bg-blue-800 text-white py-3 rounded-lg mt-5 hover:bg-black">Add to Cart</button>
+</div>
+</div>
+
+<div class="product bg-white rounded-xl shadow-lg overflow-hidden"
+data-id="13" data-name="Studio Monitor Speakers" data-price="480000"
+data-img="https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=700">
+<img src="https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=700" class="w-full h-56 object-cover">
+<div class="p-5">
+<span class="bg-yellow-100 text-yellow-700 px-3 py-1 rounded-full text-xs">LIMITED</span>
+<h3 class="font-bold mt-3">Studio Monitor Speakers</h3>
+<p class="text-blue-800 font-bold text-2xl mt-2">₦480,000</p>
+<div class="text-yellow-500 mt-2">★★★★★ (68)</div>
+<button onclick="addToCart(event)" class="w-full bg-blue-800 text-white py-3 rounded-lg mt-5 hover:bg-black">Add to Cart</button>
+</div>
+</div>
+
+</div>
+</div>
+</section>
+
+<!-- ================= WHY SHOP WITH US ================= -->
+<section class="py-20 bg-white">
+<div class="max-w-7xl mx-auto px-5">
+<div class="text-center mb-14">
+<h2 class="text-4xl font-bold">Why Shop With E-Musical Shopping?</h2>
+<p class="text-gray-600 mt-4">Trusted by churches, schools, studios and musicians nationwide.</p>
+</div>
+<div class="grid md:grid-cols-4 gap-8">
+<div class="text-center p-8 rounded-xl shadow-lg">
+<div class="text-6xl text-blue-800 mb-5">🎼</div>
+<h3 class="font-bold text-xl">Premium Brands</h3>
+<p class="text-gray-600 mt-3">Only genuine products from trusted manufacturers.</p>
+</div>
+<div class="text-center p-8 rounded-xl shadow-lg">
+<div class="text-6xl text-blue-800 mb-5">🚚</div>
+<h3 class="font-bold text-xl">Nationwide Delivery</h3>
+<p class="text-gray-600 mt-3">We deliver safely to every state in Nigeria.</p>
+</div>
+<div class="text-center p-8 rounded-xl shadow-lg">
+<div class="text-6xl text-blue-800 mb-5">💳</div>
+<h3 class="font-bold text-xl">Secure Payments</h3>
+<p class="text-gray-600 mt-3">Bank Transfer, POS and Cash options available.</p>
+</div>
+<div class="text-center p-8 rounded-xl shadow-lg">
+<div class="text-6xl text-blue-800 mb-5">🛠️</div>
+<h3 class="font-bold text-xl">Professional Support</h3>
+<p class="text-gray-600 mt-3">Repairs, installation and expert consultation.</p>
+</div>
+</div>
+</div>
+</section>
+
+<!-- ================= BRANDS ================= -->
+<section class="py-20 bg-gray-100">
+<div class="max-w-7xl mx-auto px-5">
+<div class="text-center mb-12">
+<h2 class="text-4xl font-bold">Top Brands We Sell</h2>
+</div>
+<div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
+<div class="bg-white rounded-xl shadow p-8 text-center font-bold text-xl">YAMAHA</div>
+<div class="bg-white rounded-xl shadow p-8 text-center font-bold text-xl">ROLAND</div>
+<div class="bg-white rounded-xl shadow p-8 text-center font-bold text-xl">FENDER</div>
+<div class="bg-white rounded-xl shadow p-8 text-center font-bold text-xl">IBANEZ</div>
+<div class="bg-white rounded-xl shadow p-8 text-center font-bold text-xl">JBL</div>
+<div class="bg-white rounded-xl shadow p-8 text-center font-bold text-xl">SHURE</div>
+</div>
+</div>
+</section>
+
+<!-- ================= PROMO BANNER ================= -->
+<section class="py-20 bg-gradient-to-r from-blue-900 to-blue-700">
+<div class="max-w-6xl mx-auto px-5 text-center text-white">
+<h2 class="text-5xl font-bold">Music Starts Here 🎹</h2>
+<p class="mt-6 text-xl">Upgrade your church, studio or stage with premium musical instruments and professional audio equipment.</p>
+<a href="#products" class="inline-block mt-8 bg-white text-blue-900 px-10 py-4 rounded-full font-bold hover:bg-yellow-400 transition">Start Shopping</a>
+</div>
+</section>
+
+<!-- ================= CONTACT ================= -->
+<section id="contact" class="py-20 bg-white">
+<div class="max-w-7xl mx-auto px-5">
+<div class="text-center mb-12">
+<h2 class="text-4xl font-bold">Contact E-Musical Shopping</h2>
+<p class="text-gray-600 mt-3">We are always available to help you purchase quality musical instruments.</p>
+</div>
+
+<div class="grid lg:grid-cols-2 gap-10">
+
+<div class="bg-gray-50 rounded-xl shadow-lg p-8">
+<h3 class="text-2xl font-bold mb-6">Business Information</h3>
+<div class="space-y-5">
+<div class="flex items-start gap-4">
+<i class="fas fa-user text-blue-700 text-xl mt-1"></i>
+<div><h4 class="font-semibold">Owner</h4><p>Sunday Eruchi</p></div>
+</div>
+<div class="flex items-start gap-4">
+<i class="fas fa-phone text-blue-700 text-xl mt-1"></i>
+<div><h4 class="font-semibold">Phone</h4><p>08122321064</p></div>
+</div>
+<div class="flex items-start gap-4">
+<i class="fab fa-whatsapp text-green-600 text-xl mt-1"></i>
+<div><h4 class="font-semibold">WhatsApp</h4><p>09138530296</p></div>
+</div>
+<div class="flex items-start gap-4">
+<i class="fas fa-envelope text-red-500 text-xl mt-1"></i>
+<div><h4 class="font-semibold">Email</h4><p>emusic20official@gmail.com</p></div>
+</div>
+<div class="flex items-start gap-4">
+<i class="fas fa-globe-africa text-blue-700 text-xl mt-1"></i>
+<div><h4 class="font-semibold">Country</h4><p>Nigeria</p></div>
+</div>
+</div>
+
+<hr class="my-8">
+
+<h3 class="text-xl font-bold mb-5">Accepted Payment Methods</h3>
+<div class="grid grid-cols-3 gap-4">
+<div class="border rounded-lg p-4 text-center">
+<i class="fas fa-university text-3xl text-blue-700"></i>
+<p class="mt-2">Transfer</p>
+</div>
+<div class="border rounded-lg p-4 text-center">
+<i class="fas fa-money-bill-wave text-3xl text-green-600"></i>
+<p class="mt-2">Cash</p>
+</div>
+<div class="border rounded-lg p-4 text-center">
+<i class="fas fa-credit-card text-3xl text-purple-600"></i>
+<p class="mt-2">POS</p>
+</div>
+</div>
+
+<div class="bg-blue-900 text-white rounded-xl p-6 mt-8">
+<h4 class="font-bold text-xl mb-3">Bank Details</h4>
+<p><strong>Bank:</strong> OPay</p>
+<p><strong>Account Name:</strong><br>ERUCHI JOHN SUNDAY</p>
+<p><strong>Account Number:</strong><br>6434550034</p>
+</div>
+</div>
+
+<div class="bg-gray-50 rounded-xl shadow-lg p-8">
+<h3 class="text-2xl font-bold mb-6">Send Us A Message</h3>
+<form class="space-y-5">
+<input type="text" placeholder="Full Name" class="w-full border rounded-lg p-4">
+<input type="email" placeholder="Email Address" class="w-full border rounded-lg p-4">
+<input type="tel" placeholder="Phone Number" class="w-full border rounded-lg p-4">
+<select class="w-full border rounded-lg p-4">
+<option>Select Product</option>
+<option>Piano</option>
+<option>Keyboard</option>
+<option>Bass Guitar</option>
+<option>Electric Guitar</option>
+<option>Drums</option>
+<option>Speaker</option>
+<option>Mixer</option>
+<option>Studio Equipment</option>
+</select>
+<textarea rows="6" placeholder="Type your message..." class="w-full border rounded-lg p-4"></textarea>
+<button class="w-full bg-blue-900 text-white py-4 rounded-lg hover:bg-black">Send Message</button>
+</form>
+</div>
+
+</div>
+</div>
+</section>
+
+<!-- NEWSLETTER -->
+<section class="py-16 bg-blue-900">
+<div class="max-w-5xl mx-auto text-center px-5">
+<h2 class="text-4xl font-bold text-white">Subscribe To Our Newsletter</h2>
+<p class="text-blue-100 mt-4">Receive updates on discounts, new arrivals and exclusive offers.</p>
+<div class="flex flex-col md:flex-row mt-8 gap-4">
+<input type="email" placeholder="Enter your email address" class="flex-1 rounded-lg p-4">
+<button class="bg-yellow-400 text-black font-bold px-8 rounded-lg">Subscribe</button>
+</div>
+</div>
+</section>
+
+<!-- FOOTER -->
+<footer class="bg-black text-white">
+<div class="max-w-7xl mx-auto px-5 py-16">
+<div class="grid md:grid-cols-4 gap-10">
+<div>
+<h3 class="text-2xl font-bold text-yellow-400">E-Musical Shopping</h3>
+<p class="mt-4 text-gray-400">Your One-Stop Shop For Quality Musical Instruments, Audio Equipment & Accessories.</p>
+</div>
+<div>
+<h4 class="font-bold text-lg mb-4">Quick Links</h4>
+<ul class="space-y-2">
+<li><a href="#">Home</a></li>
+<li><a href="#">Shop</a></li>
+<li><a href="#">Categories</a></li>
+<li><a href="#">About</a></li>
+<li><a href="#contact">Contact</a></li>
+</ul>
+</div>
+<div>
+<h4 class="font-bold text-lg mb-4">Customer Care</h4>
+<ul class="space-y-2">
+<li>FAQs</li>
+<li>Privacy Policy</li>
+<li>Refund Policy</li>
+<li>Shipping Policy</li>
+<li>Terms & Conditions</li>
+</ul>
+</div>
+<div>
+<h4 class="font-bold text-lg mb-4">Follow Us</h4>
+<div class="flex gap-4 text-2xl">
+<a href="https://wa.me/2349138530296"><i class="fab fa-whatsapp text-green-500"></i></a>
+<a href="https://www.tiktok.com/@emusical.instrume?_r=1&_t=ZS-98HeYxMhY9s"><i class="fab fa-tiktok"></i></a>
+<a href="https://t.me/Sundayeruchi2000"><i class="fab fa-telegram text-blue-400"></i></a>
+</div>
+</div>
+</div>
+
+<hr class="border-gray-700 my-10">
+<div class="text-center text-gray-400">
+<p>© 2026 E-Musical Shopping. All Rights Reserved.</p>
+<p class="mt-2">Designed for musicians across Nigeria.</p>
+</div>
+</div>
+</footer>
+
+<!-- FLOATING WHATSAPP -->
+<a href="https://wa.me/2349138530296" target="_blank"
+class="fixed bottom-6 right-6 w-16 h-16 bg-green-500 rounded-full flex items-center justify-center shadow-2xl hover:scale-110 transition z-40">
+<i class="fab fa-whatsapp text-white text-4xl"></i>
+</a>
+
+<!-- CART MODAL -->
+<div id="cart-modal" class="hidden fixed inset-0 z-[100] bg-black/50 flex justify-end">
+<div class="cart-panel bg-white w-full max-w-md h-full flex flex-col shadow-2xl">
+<div class="flex items-center justify-between p-5 border-b bg-blue-900 text-white">
+<h3 class="text-xl font-bold"><i class="fa-solid fa-cart-shopping mr-2"></i>Your Cart</h3>
+<button onclick="closeCart()" class="text-3xl leading-none hover:text-yellow-300">&times;</button>
+</div>
+
+<div class="flex-1 overflow-y-auto p-5" id="cart-items"></div>
+<p id="cart-empty" class="text-center text-gray-500 p-10">Your cart is empty.</p>
+
+<div id="cart-footer" class="border-t p-5 hidden">
+<div class="flex justify-between text-xl font-bold mb-4">
+<span>Total:</span>
+<span id="cart-total">₦0</span>
+</div>
+<button onclick="checkoutWhatsApp()" class="w-full bg-green-500 text-white py-4 rounded-lg font-bold hover:bg-green-600 flex items-center justify-center gap-2">
+<i class="fa-brands fa-whatsapp text-2xl"></i> Checkout via WhatsApp
+</button>
+<button onclick="closeCart()" class="w-full mt-3 border border-gray-300 py-3 rounded-lg hover:bg-gray-100">Continue Shopping</button>
+</div>
+</div>
+</div>
+
+<!-- TOAST -->
+<div id="toast" class="hidden fixed bottom-6 left-6 z-[100] bg-black text-white px-6 py-3 rounded-lg shadow-lg items-center gap-2">
+<i class="fa-solid fa-circle-check text-green-400"></i>
+<span id="toast-text"></span>
+</div>
+
+<!-- SCRIPT -->
+<script>
+
+let cart = JSON.parse(localStorage.getItem('emc_cart') || '[]');
+
+function formatNaira(num){
+  return '₦' + Number(num).toLocaleString('en-NG');
+}
+
+function updateCartCount(){
+  const count = cart.reduce((sum, item) => sum + item.qty, 0);
+  document.getElementById('cart-count').textContent = count;
+}
+
+function saveCart(){
+  localStorage.setItem('emc_cart', JSON.stringify(cart));
+  updateCartCount();
+  renderCart();
+}
+
+function addToCart(e){
+  const card = e.target.closest('.product');
+  const id = card.dataset.id;
+  const name = card.dataset.name;
+  const price = Number(card.dataset.price);
+  const img = card.dataset.img;
+
+  const existing = cart.find(i => i.id === id);
+  if(existing){
+    existing.qty += 1;
+  }else{
+    cart.push({ id, name, price, img, qty: 1 });
+  }
+  saveCart();
+  showToast(name + ' added to cart');
+}
+
+function removeFromCart(id){
+  cart = cart.filter(i => i.id !== id);
+  saveCart();
+}
+
+function changeQty(id, delta){
+  const item = cart.find(i => i.id === id);
+  if(!item) return;
+  item.qty += delta;
+  if(item.qty <= 0){
+    removeFromCart(id);
+    return;
+  }
+  saveCart();
+}
+
+function cartTotal(){
+  return cart.reduce((sum, i) => sum + i.price * i.qty, 0);
+}
+
+function renderCart(){
+  const container = document.getElementById('cart-items');
+  const emptyMsg = document.getElementById('cart-empty');
+  const footer = document.getElementById('cart-footer');
+
+  container.innerHTML = '';
+
+  if(cart.length === 0){
+    emptyMsg.classList.remove('hidden');
+    footer.classList.add('hidden');
+    return;
+  }
+
+  emptyMsg.classList.add('hidden');
+  footer.classList.remove('hidden');
+
+  cart.forEach(item => {
+    const row = document.createElement('div');
+    row.className = 'flex items-center gap-4 border-b py-4';
+    row.innerHTML = `
+      <img src="${item.img}" class="w-20 h-20 object-cover rounded-lg">
+      <div class="flex-1">
+        <h4 class="font-semibold">${item.name}</h4>
+        <p class="text-blue-700 font-bold">${formatNaira(item.price)}</p>
+        <div class="flex items-center gap-3 mt-2">
+          <button onclick="changeQty('${item.id}', -1)" class="w-8 h-8 border rounded-lg hover:bg-gray-100">−</button>
+          <span>${item.qty}</span>
+          <button onclick="changeQty('${item.id}', 1)" class="w-8 h-8 border rounded-lg hover:bg-gray-100">+</button>
+          <button onclick="removeFromCart('${item.id}')" class="ml-4 text-red-600 text-sm hover:underline">
+            <i class="fa-solid fa-trash"></i> Remove
+          </button>
+        </div>
+      </div>
+      <div class="font-bold whitespace-nowrap">${formatNaira(item.price * item.qty)}</div>
+    `;
+    container.appendChild(row);
+  });
+
+  document.getElementById('cart-total').textContent = formatNaira(cartTotal());
+}
+
+function openCart(){
+  renderCart();
+  document.getElementById('cart-modal').classList.remove('hidden');
+  document.body.classList.add('overflow-hidden');
+}
+
+function closeCart(){
+  document.getElementById('cart-modal').classList.add('hidden');
+  document.body.classList.remove('overflow-hidden');
+}
+
+function checkoutWhatsApp(){
+  if(cart.length === 0) return;
+
+  let msg = "Hello E-Musical Shopping, I would like to order the following items:\n\n";
+
+  cart.forEach((item, idx) => {
+    msg += `${idx + 1}. ${item.name}\n   Qty: ${item.qty} x ${formatNaira(item.price)} = ${formatNaira(item.price * item.qty)}\n\n`;
+  });
+
+  msg += `Total: ${formatNaira(cartTotal())}\n\nPlease confirm availability and delivery details. Thank you.`;
+
+  window.open(`https://wa.me/2349138530296?text=${encodeURIComponent(msg)}`, '_blank');
+}
+
+function showToast(text){
+  const toast = document.getElementById('toast');
+  document.getElementById('toast-text').textContent = text;
+  toast.classList.remove('hidden');
+  toast.classList.add('flex');
+  setTimeout(() => {
+    toast.classList.add('hidden');
+    toast.classList.remove('flex');
+  }, 2000);
+}
+
+window.addEventListener("scroll", function(){
+  if(window.scrollY > 100){
+    document.querySelector("header").classList.add("shadow-xl");
+  }else{
+    document.querySelector("header").classList.remove("shadow-xl");
+  }
+});
+
+document.addEventListener('DOMContentLoaded', updateCartCount);
+
+</script>
+
+</body>
+</html>
