@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>E-Musical Shopping | Nigeria's No.1 Musical Instrument Store</title>
+<title>E-Musical Shopping | Nigeria's No.1 Yamaha Instrument Store</title>
 
 <script src="https://cdn.tailwindcss.com"></script>
 
@@ -58,6 +58,27 @@ animation:slideIn .25s ease-out;
 from{transform:translateX(100%);}
 to{transform:translateX(0);}
 }
+.faq-answer{
+max-height:0;
+overflow:hidden;
+transition:max-height .3s ease;
+}
+.faq-item.open .faq-answer{
+max-height:300px;
+}
+.faq-item.open .faq-icon{
+transform:rotate(45deg);
+}
+.faq-icon{
+transition:transform .2s;
+}
+#mobile-menu{
+transition:max-height .3s ease;
+overflow:hidden;
+}
+#back-to-top{
+transition:opacity .3s, visibility .3s;
+}
 </style>
 
 </head>
@@ -69,7 +90,7 @@ to{transform:translateX(0);}
 <div class="max-w-7xl mx-auto flex justify-between items-center px-5 py-2">
 <div class="flex gap-5">
 <p><i class="fa-solid fa-phone"></i> 08122321064</p>
-<p><i class="fa-solid fa-envelope"></i> emusic20official@gmail.com</p>
+<p class="hidden sm:block"><i class="fa-solid fa-envelope"></i> emusic20official@gmail.com</p>
 </div>
 <div class="hidden md:flex gap-6">
 <a href="#" class="hover:text-yellow-300">Track Order</a>
@@ -84,19 +105,20 @@ to{transform:translateX(0);}
 <header class="bg-white shadow sticky top-0 z-50">
 <div class="max-w-7xl mx-auto px-5 py-4 flex items-center justify-between">
 <div class="flex items-center gap-3">
-<img src="https://cdn-icons-png.flaticon.com/512/3659/3659899.png" class="w-14 h-14">
+<!-- REPLACE IMAGE: your logo -->
+<img src="https://placehold.co/100x100/0047AB/ffffff?text=LOGO" class="w-14 h-14 rounded-full object-cover">
 <div>
-<h1 class="text-3xl font-bold text-blue-900">E-Musical Shopping</h1>
-<p class="text-xs text-gray-500">Your One-Stop Shop For Musical Instruments</p>
+<h1 class="text-2xl md:text-3xl font-bold text-blue-900">E-Musical Shopping</h1>
+<p class="text-xs text-gray-500">Yamaha Keyboards, Pianos & Drums</p>
 </div>
 </div>
 
 <nav class="hidden lg:flex gap-8 font-medium">
-<a href="#" class="menu">Home</a>
-<a href="#" class="menu">Shop</a>
-<a href="#" class="menu">Categories</a>
-<a href="#" class="menu">Flash Sale</a>
-<a href="#" class="menu">About</a>
+<a href="#home" class="menu">Home</a>
+<a href="#products" class="menu">Shop</a>
+<a href="#bestsellers" class="menu">Best Sellers</a>
+<a href="#faq" class="menu">FAQ</a>
+<a href="#about" class="menu">About</a>
 <a href="#contact" class="menu">Contact</a>
 </nav>
 
@@ -108,19 +130,31 @@ to{transform:translateX(0);}
 <i class="fa-solid fa-cart-shopping text-2xl"></i>
 <span id="cart-count" class="absolute -top-2 -right-2 bg-red-600 text-white text-xs rounded-full w-5 h-5 flex justify-center items-center">0</span>
 </button>
-<button class="lg:hidden">
+<button class="lg:hidden" onclick="toggleMobileMenu()">
 <i class="fa-solid fa-bars text-2xl"></i>
 </button>
 </div>
+</div>
+
+<!-- MOBILE MENU -->
+<div id="mobile-menu" class="lg:hidden max-h-0 bg-white border-t">
+<nav class="flex flex-col p-5 gap-4 font-medium">
+<a href="#home" class="menu" onclick="toggleMobileMenu()">Home</a>
+<a href="#products" class="menu" onclick="toggleMobileMenu()">Shop</a>
+<a href="#bestsellers" class="menu" onclick="toggleMobileMenu()">Best Sellers</a>
+<a href="#faq" class="menu" onclick="toggleMobileMenu()">FAQ</a>
+<a href="#about" class="menu" onclick="toggleMobileMenu()">About</a>
+<a href="#contact" class="menu" onclick="toggleMobileMenu()">Contact</a>
+</nav>
 </div>
 
 <!-- SEARCH BAR -->
 <div class="bg-gray-100 border-t">
 <div class="max-w-7xl mx-auto px-5 py-4">
 <div class="flex">
-<input type="search" placeholder="Search for Pianos, Guitars, Speakers, Mixers..." class="w-full rounded-l-lg border p-4 outline-none">
+<input type="search" id="search-input" oninput="filterProducts()" placeholder="Search for Keyboards, Pianos, Drums..." class="w-full rounded-l-lg border p-4 outline-none">
 <button class="bg-blue-800 text-white px-8 rounded-r-lg hover:bg-black">
-<i class="fa-solid fa-magnifying-glass"></i> Search
+<i class="fa-solid fa-magnifying-glass"></i>
 </button>
 </div>
 </div>
@@ -128,7 +162,7 @@ to{transform:translateX(0);}
 </header>
 
 <!-- ================= HERO SECTION ================= -->
-<section class="bg-gray-100 py-8">
+<section id="home" class="bg-gray-100 py-8">
 <div class="max-w-7xl mx-auto px-5">
 <div class="grid lg:grid-cols-4 gap-6">
 
@@ -138,20 +172,10 @@ to{transform:translateX(0);}
 <h2 class="text-xl font-bold"><i class="fa-solid fa-list mr-2"></i>Browse Categories</h2>
 </div>
 <ul class="divide-y">
-<li class="p-4 hover:bg-gray-100 cursor-pointer">🎹 Pianos</li>
-<li class="p-4 hover:bg-gray-100 cursor-pointer">⌨️ Keyboards</li>
-<li class="p-4 hover:bg-gray-100 cursor-pointer">🎸 Acoustic Guitars</li>
-<li class="p-4 hover:bg-gray-100 cursor-pointer">🎸 Electric Guitars</li>
-<li class="p-4 hover:bg-gray-100 cursor-pointer">🎸 Bass Guitars</li>
-<li class="p-4 hover:bg-gray-100 cursor-pointer">🥁 Drums</li>
-<li class="p-4 hover:bg-gray-100 cursor-pointer">🎷 Saxophones</li>
-<li class="p-4 hover:bg-gray-100 cursor-pointer">🎺 Trumpets</li>
-<li class="p-4 hover:bg-gray-100 cursor-pointer">🎻 Violins</li>
-<li class="p-4 hover:bg-gray-100 cursor-pointer">🎤 Microphones</li>
-<li class="p-4 hover:bg-gray-100 cursor-pointer">🔊 Speakers</li>
-<li class="p-4 hover:bg-gray-100 cursor-pointer">🎚️ Mixers</li>
-<li class="p-4 hover:bg-gray-100 cursor-pointer">🎧 Studio Equipment</li>
-<li class="p-4 hover:bg-gray-100 cursor-pointer">🛍 Accessories</li>
+<li class="p-4 hover:bg-gray-100 cursor-pointer" onclick="filterByCategory('arranger')">🎹 Arranger Keyboards (PSR-SX Series)</li>
+<li class="p-4 hover:bg-gray-100 cursor-pointer" onclick="filterByCategory('portable')">⌨️ Portable Keyboards (PSR-E Series)</li>
+<li class="p-4 hover:bg-gray-100 cursor-pointer" onclick="filterByCategory('drums')">🥁 Yamaha Drums</li>
+<li class="p-4 hover:bg-gray-100 cursor-pointer" onclick="filterByCategory('all')">🛍 View All Products</li>
 </ul>
 </div>
 
@@ -160,14 +184,15 @@ to{transform:translateX(0);}
 <div class="grid md:grid-cols-2 items-center">
 <div class="p-10 text-white">
 <span class="bg-yellow-400 text-black px-4 py-1 rounded-full text-sm font-semibold">NEW ARRIVALS</span>
-<h1 class="text-5xl font-bold mt-6">Premium Musical Instruments</h1>
-<p class="mt-6 text-lg">Discover genuine keyboards, pianos, guitars, drums, studio equipment and professional audio systems at unbeatable prices.</p>
+<h1 class="text-4xl md:text-5xl font-bold mt-6">Genuine Yamaha Keyboards & Drums</h1>
+<p class="mt-6 text-lg">From the PSR-E series to the flagship PSR-SX900, plus quality Yamaha drum sets — everything for church, studio and stage.</p>
 <div class="mt-8">
 <a href="#products" class="bg-white text-blue-900 px-8 py-4 rounded-lg font-bold hover:bg-yellow-300 transition">Shop Now</a>
 </div>
 </div>
 <div class="h-full">
-<img src="https://images.unsplash.com/photo-1511379938547-c1f69419868d?w=900" class="w-full h-full object-cover" alt="Musical Instruments">
+<!-- REPLACE IMAGE: hero image -->
+<img src="https://placehold.co/900x700/1e3a8a/ffffff?text=Yamaha+Keyboard" class="w-full h-full object-cover" alt="Yamaha Keyboard">
 </div>
 </div>
 </div>
@@ -176,7 +201,7 @@ to{transform:translateX(0);}
 <div class="space-y-6">
 <div class="bg-white rounded-xl shadow-lg p-6">
 <h3 class="text-xl font-bold text-blue-900">🔥 Flash Sale</h3>
-<p class="text-gray-600 mt-3">Up to <span class="font-bold text-red-600">30% OFF</span> selected musical instruments.</p>
+<p class="text-gray-600 mt-3">Special prices on selected <span class="font-bold text-red-600">Yamaha keyboards</span>.</p>
 <a href="#products" class="inline-block mt-4 text-blue-700 font-semibold">Shop Deals →</a>
 </div>
 <div class="bg-black text-white rounded-xl shadow-lg p-6">
@@ -203,7 +228,7 @@ to{transform:translateX(0);}
 </div>
 <div class="flex items-center gap-4 bg-gray-50 p-5 rounded-xl shadow">
 <i class="fa-solid fa-award text-4xl text-blue-800"></i>
-<div><h4 class="font-bold">100% Genuine</h4><p class="text-sm text-gray-500">Trusted Brands</p></div>
+<div><h4 class="font-bold">100% Genuine</h4><p class="text-sm text-gray-500">Original Yamaha Products</p></div>
 </div>
 <div class="flex items-center gap-4 bg-gray-50 p-5 rounded-xl shadow">
 <i class="fa-solid fa-headset text-4xl text-blue-800"></i>
@@ -217,134 +242,101 @@ to{transform:translateX(0);}
 </div>
 </section>
 
-<!-- ================= FLASH SALE ================= -->
+<!-- ================= PRODUCTS ================= -->
 <section id="products" class="py-12 bg-gray-100">
 <div class="max-w-7xl mx-auto px-5">
 
-<div class="flex justify-between items-center mb-8">
+<div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
 <div>
-<h2 class="text-3xl font-bold text-gray-800">🔥 Flash Sale</h2>
-<p class="text-gray-500">Limited-time discounts on selected products</p>
+<h2 class="text-3xl font-bold text-gray-800">🎹 Our Products</h2>
+<p class="text-gray-500">Genuine Yamaha Keyboards & Drums</p>
 </div>
-<a href="#" class="text-blue-700 font-semibold">View All →</a>
+<div class="flex items-center gap-3">
+<label for="sort-select" class="text-sm text-gray-600 hidden sm:block">Sort by:</label>
+<select id="sort-select" onchange="sortProducts()" class="border rounded-lg p-3 outline-none bg-white">
+<option value="default">Default</option>
+<option value="low-high">Price: Low to High</option>
+<option value="high-low">Price: High to Low</option>
+</select>
+</div>
 </div>
 
-<div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
+<p id="no-results" class="hidden text-center text-gray-500 py-10">No products match your search.</p>
 
-<div class="product bg-white rounded-xl shadow overflow-hidden"
-data-id="1" data-name="Yamaha PSR-E373 Keyboard" data-price="395000"
-data-img="https://images.unsplash.com/photo-1514119412350-e174d90d280e?w=600">
-<span class="absolute top-2 left-2 z-10 bg-red-600 text-white text-xs px-2 py-1 rounded-lg">-15%</span>
-<img src="https://images.unsplash.com/photo-1514119412350-e174d90d280e?w=600" class="w-full h-48 object-cover">
+<div id="product-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+
+<div class="product bg-white rounded-xl shadow overflow-hidden" data-category="arranger"
+data-id="1" data-name="Yamaha PSR SX600" data-price="1350000">
+<!-- REPLACE IMAGE: Yamaha PSR SX600 -->
+<img src="/IMG-20260811-WA0228.jpg" class="w-full h-48 object-cover">
 <div class="p-4">
-<h3 class="font-semibold">Yamaha PSR-E373 Keyboard</h3>
-<p class="text-blue-700 font-bold text-xl mt-2">₦395,000</p>
-<p class="text-sm line-through text-gray-400">₦465,000</p>
+<h3 class="font-semibold">Yamaha PSR SX600</h3>
+<p class="text-blue-700 font-bold text-xl mt-2">₦1,350,000</p>
 <div class="text-yellow-500 mt-2">★★★★★</div>
 <button onclick="addToCart(event)" class="mt-4 w-full bg-blue-800 text-white py-2 rounded-lg hover:bg-black">Add to Cart</button>
 </div>
 </div>
 
-<div class="product bg-white rounded-xl shadow overflow-hidden"
-data-id="2" data-name="Roland FP-10 Digital Piano" data-price="1680000"
-data-img="https://images.unsplash.com/photo-1510915361894-db8b60106cb1?w=600">
-<img src="https://images.unsplash.com/photo-1510915361894-db8b60106cb1?w=600" class="w-full h-48 object-cover">
+<div class="product bg-white rounded-xl shadow overflow-hidden" data-category="arranger"
+data-id="2" data-name="Yamaha PSR SX720" data-price="2200000">
+<span class="absolute top-2 left-2 z-10 bg-blue-600 text-white text-xs px-2 py-1 rounded-lg">POPULAR</span>
+<!-- REPLACE IMAGE: Yamaha PSR SX720 -->
+<img src="/IMG-20260811-WA0229.jpg" class="w-full h-48 object-cover">
 <div class="p-4">
-<h3 class="font-semibold">Roland FP-10 Digital Piano</h3>
-<p class="text-blue-700 font-bold text-xl mt-2">₦1,680,000</p>
-<p class="text-sm line-through text-gray-400">₦1,820,000</p>
+<h3 class="font-semibold">Yamaha PSR SX720</h3>
+<p class="text-blue-700 font-bold text-xl mt-2">₦2,200,000</p>
 <div class="text-yellow-500 mt-2">★★★★★</div>
 <button onclick="addToCart(event)" class="mt-4 w-full bg-blue-800 text-white py-2 rounded-lg hover:bg-black">Add to Cart</button>
 </div>
 </div>
 
-<div class="product bg-white rounded-xl shadow overflow-hidden"
-data-id="3" data-name="Fender Electric Guitar" data-price="980000"
-data-img="https://images.unsplash.com/photo-1519892300165-cb5542fb47c7?w=600">
-<img src="https://images.unsplash.com/photo-1519892300165-cb5542fb47c7?w=600" class="w-full h-48 object-cover">
+<div class="product bg-white rounded-xl shadow overflow-hidden" data-category="arranger"
+data-id="3" data-name="Yamaha PSR SX900" data-price="2500000">
+<span class="absolute top-2 left-2 z-10 bg-red-600 text-white text-xs px-2 py-1 rounded-lg">FLAGSHIP</span>
+<!-- REPLACE IMAGE: Yamaha PSR SX900 -->
+<img src="/IMG-20260811-WA0230.jpg" class="w-full h-48 object-cover">
 <div class="p-4">
-<h3 class="font-semibold">Fender Electric Guitar</h3>
-<p class="text-blue-700 font-bold text-xl">₦980,000</p>
-<p class="text-sm line-through text-gray-400">₦1,120,000</p>
-<div class="text-yellow-500">★★★★★</div>
+<h3 class="font-semibold">Yamaha PSR SX900</h3>
+<p class="text-blue-700 font-bold text-xl mt-2">₦2,500,000</p>
+<div class="text-yellow-500 mt-2">★★★★★</div>
 <button onclick="addToCart(event)" class="mt-4 w-full bg-blue-800 text-white py-2 rounded-lg hover:bg-black">Add to Cart</button>
 </div>
 </div>
 
-<div class="product bg-white rounded-xl shadow overflow-hidden"
-data-id="4" data-name="Pearl Drum Set" data-price="1450000"
-data-img="https://images.unsplash.com/photo-1516280440614-37939bbacd81?w=600">
-<img src="https://images.unsplash.com/photo-1516280440614-37939bbacd81?w=600" class="w-full h-48 object-cover">
+<div class="product bg-white rounded-xl shadow overflow-hidden" data-category="portable"
+data-id="4" data-name="Yamaha PSR E583" data-price="720000">
+<!-- REPLACE IMAGE: Yamaha PSR E583 -->
+<img src="/IMG-20260811-WA0239.jpg" class="w-full h-48 object-cover">
 <div class="p-4">
-<h3 class="font-semibold">Pearl Drum Set</h3>
-<p class="text-blue-700 font-bold text-xl">₦1,450,000</p>
-<p class="text-sm line-through text-gray-400">₦1,650,000</p>
-<div class="text-yellow-500">★★★★★</div>
+<h3 class="font-semibold">Yamaha PSR E583</h3>
+<p class="text-blue-700 font-bold text-xl mt-2">₦720,000</p>
+<div class="text-yellow-500 mt-2">★★★★★</div>
 <button onclick="addToCart(event)" class="mt-4 w-full bg-blue-800 text-white py-2 rounded-lg hover:bg-black">Add to Cart</button>
 </div>
 </div>
 
-<div class="product bg-white rounded-xl shadow overflow-hidden"
-data-id="5" data-name="Ibanez Bass Guitar" data-price="760000"
-data-img="https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=600">
-<img src="https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=600" class="w-full h-48 object-cover">
+<div class="product bg-white rounded-xl shadow overflow-hidden" data-category="portable"
+data-id="5" data-name="Yamaha PSR E483" data-price="550000">
+<!-- REPLACE IMAGE: Yamaha PSR E483 -->
+<img src="https://placehold.co/600x400/e5e7eb/1e293b?text=Yamaha+PSR+E483" class="w-full h-48 object-cover">
 <div class="p-4">
-<h3 class="font-semibold">Ibanez Bass Guitar</h3>
-<p class="text-blue-700 font-bold text-xl">₦760,000</p>
-<p class="text-sm line-through text-gray-400">₦850,000</p>
-<div class="text-yellow-500">★★★★★</div>
+<h3 class="font-semibold">Yamaha PSR E483</h3>
+<p class="text-blue-700 font-bold text-xl mt-2">₦550,000</p>
+<div class="text-yellow-500 mt-2">★★★★★</div>
 <button onclick="addToCart(event)" class="mt-4 w-full bg-blue-800 text-white py-2 rounded-lg hover:bg-black">Add to Cart</button>
 </div>
 </div>
 
+<div class="product bg-white rounded-xl shadow overflow-hidden" data-category="drums"
+data-id="6" data-name="Yamaha Drums" data-price="300000">
+<!-- REPLACE IMAGE: Yamaha Drums -->
+<img src="https://placehold.co/600x400/e5e7eb/1e293b?text=Yamaha+Drums" class="w-full h-48 object-cover">
+<div class="p-4">
+<h3 class="font-semibold">Yamaha Drums</h3>
+<p class="text-blue-700 font-bold text-xl mt-2">₦300,000</p>
+<div class="text-yellow-500 mt-2">★★★★★</div>
+<button onclick="addToCart(event)" class="mt-4 w-full bg-blue-800 text-white py-2 rounded-lg hover:bg-black">Add to Cart</button>
 </div>
-</div>
-</section>
-
-<!-- ================= FEATURED PRODUCTS ================= -->
-<section class="py-16 bg-white">
-<div class="max-w-7xl mx-auto px-5">
-<div class="flex justify-between items-center mb-10">
-<h2 class="text-3xl font-bold">⭐ Featured Products</h2>
-<a href="#" class="text-blue-700 font-semibold">Browse All →</a>
-</div>
-
-<div class="grid md:grid-cols-4 gap-6">
-
-<div class="product bg-white rounded-xl shadow p-5"
-data-id="6" data-name="Behringer Mixer X1204USB" data-price="290000"
-data-img="https://images.unsplash.com/photo-1507838153414-b4b713384a76?w=600">
-<img src="https://images.unsplash.com/photo-1507838153414-b4b713384a76?w=600" class="rounded-lg h-52 w-full object-cover">
-<h3 class="font-semibold mt-4">Behringer Mixer X1204USB</h3>
-<p class="text-blue-700 font-bold text-xl mt-2">₦290,000</p>
-<button onclick="addToCart(event)" class="mt-4 w-full bg-blue-800 text-white py-2 rounded-lg">Buy Now</button>
-</div>
-
-<div class="product bg-white rounded-xl shadow p-5"
-data-id="7" data-name="Studio Headphones" data-price="85000"
-data-img="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=600">
-<img src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=600" class="rounded-lg h-52 w-full object-cover">
-<h3 class="font-semibold mt-4">Studio Headphones</h3>
-<p class="text-blue-700 font-bold text-xl">₦85,000</p>
-<button onclick="addToCart(event)" class="mt-4 w-full bg-blue-800 text-white py-2 rounded-lg">Buy Now</button>
-</div>
-
-<div class="product bg-white rounded-xl shadow p-5"
-data-id="8" data-name="Shure SM58 Microphone" data-price="210000"
-data-img="https://images.unsplash.com/photo-1465821185615-20b3c2fbf41b?w=600">
-<img src="https://images.unsplash.com/photo-1465821185615-20b3c2fbf41b?w=600" class="rounded-lg h-52 w-full object-cover">
-<h3 class="font-semibold mt-4">Shure SM58 Microphone</h3>
-<p class="text-blue-700 font-bold text-xl">₦210,000</p>
-<button onclick="addToCart(event)" class="mt-4 w-full bg-blue-800 text-white py-2 rounded-lg">Buy Now</button>
-</div>
-
-<div class="product bg-white rounded-xl shadow p-5"
-data-id="9" data-name="JBL Professional Speaker" data-price="670000"
-data-img="https://images.unsplash.com/photo-1608043152269-423dbba4e7e1?w=600">
-<img src="https://images.unsplash.com/photo-1608043152269-423dbba4e7e1?w=600" class="rounded-lg h-52 w-full object-cover">
-<h3 class="font-semibold mt-4">JBL Professional Speaker</h3>
-<p class="text-blue-700 font-bold text-xl">₦670,000</p>
-<button onclick="addToCart(event)" class="mt-4 w-full bg-blue-800 text-white py-2 rounded-lg">Buy Now</button>
 </div>
 
 </div>
@@ -352,68 +344,46 @@ data-img="https://images.unsplash.com/photo-1608043152269-423dbba4e7e1?w=600">
 </section>
 
 <!-- ================= BEST SELLERS ================= -->
-<section class="py-16 bg-gray-100">
+<section id="bestsellers" class="py-16 bg-white">
 <div class="max-w-7xl mx-auto px-5">
-
 <div class="flex justify-between items-center mb-10">
 <div>
 <h2 class="text-3xl font-bold">🔥 Best Sellers</h2>
-<p class="text-gray-500">Most purchased musical instruments this month</p>
+<p class="text-gray-500">Most requested this month</p>
 </div>
-<a href="#" class="text-blue-700 font-semibold">See More →</a>
 </div>
+<div class="grid grid-cols-2 md:grid-cols-3 gap-6">
 
-<div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-
-<div class="product bg-white rounded-xl shadow-lg overflow-hidden"
-data-id="10" data-name="Yamaha P-145 Digital Piano" data-price="1250000"
-data-img="https://images.unsplash.com/photo-1511379938547-c1f69419868d?w=700">
-<img src="https://images.unsplash.com/photo-1511379938547-c1f69419868d?w=700" class="w-full h-56 object-cover">
+<div class="bg-gray-50 rounded-xl shadow-lg overflow-hidden">
+<!-- REPLACE IMAGE: Yamaha PSR SX720 (best seller) -->
+<img src="https://placehold.co/700x500/e5e7eb/1e293b?text=Yamaha+PSR+SX720" class="w-full h-56 object-cover">
 <div class="p-5">
 <span class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs">BEST SELLER</span>
-<h3 class="font-bold mt-3">Yamaha P-145 Digital Piano</h3>
-<p class="text-blue-800 font-bold text-2xl mt-2">₦1,250,000</p>
+<h3 class="font-bold mt-3">Yamaha PSR SX720</h3>
+<p class="text-blue-800 font-bold text-2xl mt-2">₦2,200,000</p>
 <div class="text-yellow-500 mt-2">★★★★★ (124)</div>
-<button onclick="addToCart(event)" class="w-full bg-blue-800 text-white py-3 rounded-lg mt-5 hover:bg-black">Add to Cart</button>
 </div>
 </div>
 
-<div class="product bg-white rounded-xl shadow-lg overflow-hidden"
-data-id="11" data-name="Electric Bass Guitar" data-price="760000"
-data-img="https://images.unsplash.com/photo-1519892300165-cb5542fb47c7?w=700">
-<img src="https://images.unsplash.com/photo-1519892300165-cb5542fb47c7?w=700" class="w-full h-56 object-cover">
+<div class="bg-gray-50 rounded-xl shadow-lg overflow-hidden">
+<!-- REPLACE IMAGE: Yamaha PSR E583 (best seller) -->
+<img src="https://placehold.co/700x500/e5e7eb/1e293b?text=Yamaha+PSR+E583" class="w-full h-56 object-cover">
 <div class="p-5">
 <span class="bg-red-100 text-red-700 px-3 py-1 rounded-full text-xs">HOT DEAL</span>
-<h3 class="font-bold mt-3">Electric Bass Guitar</h3>
-<p class="text-blue-800 font-bold text-2xl mt-2">₦760,000</p>
+<h3 class="font-bold mt-3">Yamaha PSR E583</h3>
+<p class="text-blue-800 font-bold text-2xl mt-2">₦720,000</p>
 <div class="text-yellow-500 mt-2">★★★★★ (95)</div>
-<button onclick="addToCart(event)" class="w-full bg-blue-800 text-white py-3 rounded-lg mt-5 hover:bg-black">Add to Cart</button>
 </div>
 </div>
 
-<div class="product bg-white rounded-xl shadow-lg overflow-hidden"
-data-id="12" data-name="Professional Drum Set" data-price="1450000"
-data-img="https://images.unsplash.com/photo-1516280440614-37939bbacd81?w=700">
-<img src="https://images.unsplash.com/photo-1516280440614-37939bbacd81?w=700" class="w-full h-56 object-cover">
+<div class="bg-gray-50 rounded-xl shadow-lg overflow-hidden">
+<!-- REPLACE IMAGE: Yamaha Drums (best seller) -->
+<img src="https://placehold.co/700x500/e5e7eb/1e293b?text=Yamaha+Drums" class="w-full h-56 object-cover">
 <div class="p-5">
 <span class="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-xs">NEW</span>
-<h3 class="font-bold mt-3">Professional Drum Set</h3>
-<p class="text-blue-800 font-bold text-2xl mt-2">₦1,450,000</p>
+<h3 class="font-bold mt-3">Yamaha Drums</h3>
+<p class="text-blue-800 font-bold text-2xl mt-2">₦300,000</p>
 <div class="text-yellow-500 mt-2">★★★★★ (87)</div>
-<button onclick="addToCart(event)" class="w-full bg-blue-800 text-white py-3 rounded-lg mt-5 hover:bg-black">Add to Cart</button>
-</div>
-</div>
-
-<div class="product bg-white rounded-xl shadow-lg overflow-hidden"
-data-id="13" data-name="Studio Monitor Speakers" data-price="480000"
-data-img="https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=700">
-<img src="https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=700" class="w-full h-56 object-cover">
-<div class="p-5">
-<span class="bg-yellow-100 text-yellow-700 px-3 py-1 rounded-full text-xs">LIMITED</span>
-<h3 class="font-bold mt-3">Studio Monitor Speakers</h3>
-<p class="text-blue-800 font-bold text-2xl mt-2">₦480,000</p>
-<div class="text-yellow-500 mt-2">★★★★★ (68)</div>
-<button onclick="addToCart(event)" class="w-full bg-blue-800 text-white py-3 rounded-lg mt-5 hover:bg-black">Add to Cart</button>
 </div>
 </div>
 
@@ -422,50 +392,111 @@ data-img="https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=700">
 </section>
 
 <!-- ================= WHY SHOP WITH US ================= -->
-<section class="py-20 bg-white">
+<section id="about" class="py-20 bg-gray-100">
 <div class="max-w-7xl mx-auto px-5">
 <div class="text-center mb-14">
 <h2 class="text-4xl font-bold">Why Shop With E-Musical Shopping?</h2>
 <p class="text-gray-600 mt-4">Trusted by churches, schools, studios and musicians nationwide.</p>
 </div>
 <div class="grid md:grid-cols-4 gap-8">
-<div class="text-center p-8 rounded-xl shadow-lg">
+<div class="text-center p-8 rounded-xl shadow-lg bg-white">
 <div class="text-6xl text-blue-800 mb-5">🎼</div>
-<h3 class="font-bold text-xl">Premium Brands</h3>
-<p class="text-gray-600 mt-3">Only genuine products from trusted manufacturers.</p>
+<h3 class="font-bold text-xl">100% Genuine Yamaha</h3>
+<p class="text-gray-600 mt-3">Only authentic products, no fakes.</p>
 </div>
-<div class="text-center p-8 rounded-xl shadow-lg">
+<div class="text-center p-8 rounded-xl shadow-lg bg-white">
 <div class="text-6xl text-blue-800 mb-5">🚚</div>
 <h3 class="font-bold text-xl">Nationwide Delivery</h3>
 <p class="text-gray-600 mt-3">We deliver safely to every state in Nigeria.</p>
 </div>
-<div class="text-center p-8 rounded-xl shadow-lg">
+<div class="text-center p-8 rounded-xl shadow-lg bg-white">
 <div class="text-6xl text-blue-800 mb-5">💳</div>
 <h3 class="font-bold text-xl">Secure Payments</h3>
 <p class="text-gray-600 mt-3">Bank Transfer, POS and Cash options available.</p>
 </div>
-<div class="text-center p-8 rounded-xl shadow-lg">
+<div class="text-center p-8 rounded-xl shadow-lg bg-white">
 <div class="text-6xl text-blue-800 mb-5">🛠️</div>
 <h3 class="font-bold text-xl">Professional Support</h3>
-<p class="text-gray-600 mt-3">Repairs, installation and expert consultation.</p>
+<p class="text-gray-600 mt-3">Setup, training and expert consultation.</p>
 </div>
 </div>
 </div>
 </section>
 
-<!-- ================= BRANDS ================= -->
-<section class="py-20 bg-gray-100">
+<!-- ================= TESTIMONIALS ================= -->
+<section class="py-20 bg-white">
 <div class="max-w-7xl mx-auto px-5">
-<div class="text-center mb-12">
-<h2 class="text-4xl font-bold">Top Brands We Sell</h2>
+<div class="text-center mb-14">
+<h2 class="text-4xl font-bold">What Our Customers Say</h2>
 </div>
-<div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
-<div class="bg-white rounded-xl shadow p-8 text-center font-bold text-xl">YAMAHA</div>
-<div class="bg-white rounded-xl shadow p-8 text-center font-bold text-xl">ROLAND</div>
-<div class="bg-white rounded-xl shadow p-8 text-center font-bold text-xl">FENDER</div>
-<div class="bg-white rounded-xl shadow p-8 text-center font-bold text-xl">IBANEZ</div>
-<div class="bg-white rounded-xl shadow p-8 text-center font-bold text-xl">JBL</div>
-<div class="bg-white rounded-xl shadow p-8 text-center font-bold text-xl">SHURE</div>
+<div class="grid md:grid-cols-3 gap-8">
+<div class="bg-gray-50 rounded-xl p-8 shadow">
+<div class="text-yellow-500 mb-4">★★★★★</div>
+<p class="text-gray-600">"Bought my church a PSR SX720 and the sound quality is amazing. Delivery was fast and the keyboard was perfectly packaged."</p>
+<p class="font-bold mt-5">— Pastor Emeka, Lagos</p>
+</div>
+<div class="bg-gray-50 rounded-xl p-8 shadow">
+<div class="text-yellow-500 mb-4">★★★★★</div>
+<p class="text-gray-600">"Genuine product, fair price, and the support team helped me set everything up over the phone."</p>
+<p class="font-bold mt-5">— Chidinma, Abuja</p>
+</div>
+<div class="bg-gray-50 rounded-xl p-8 shadow">
+<div class="text-yellow-500 mb-4">★★★★★</div>
+<p class="text-gray-600">"My students love the PSR E483. Great value for a school instrument."</p>
+<p class="font-bold mt-5">— Music School, Port Harcourt</p>
+</div>
+</div>
+</div>
+</section>
+
+<!-- ================= FAQ ================= -->
+<section id="faq" class="py-20 bg-gray-100">
+<div class="max-w-4xl mx-auto px-5">
+<div class="text-center mb-12">
+<h2 class="text-4xl font-bold">Frequently Asked Questions</h2>
+</div>
+<div class="space-y-4">
+
+<div class="faq-item bg-white rounded-xl shadow overflow-hidden">
+<button class="w-full flex justify-between items-center p-5 text-left font-semibold" onclick="toggleFaq(this)">
+Are your Yamaha instruments genuine?
+<i class="fa-solid fa-plus faq-icon"></i>
+</button>
+<div class="faq-answer px-5">
+<p class="text-gray-600 pb-5">Yes, all our Yamaha keyboards and drums are 100% genuine and sourced from authorized channels.</p>
+</div>
+</div>
+
+<div class="faq-item bg-white rounded-xl shadow overflow-hidden">
+<button class="w-full flex justify-between items-center p-5 text-left font-semibold" onclick="toggleFaq(this)">
+Do you deliver nationwide?
+<i class="fa-solid fa-plus faq-icon"></i>
+</button>
+<div class="faq-answer px-5">
+<p class="text-gray-600 pb-5">Yes, we deliver to all 36 states in Nigeria with secure packaging.</p>
+</div>
+</div>
+
+<div class="faq-item bg-white rounded-xl shadow overflow-hidden">
+<button class="w-full flex justify-between items-center p-5 text-left font-semibold" onclick="toggleFaq(this)">
+What payment methods do you accept?
+<i class="fa-solid fa-plus faq-icon"></i>
+</button>
+<div class="faq-answer px-5">
+<p class="text-gray-600 pb-5">We accept Bank Transfer, POS and Cash payments.</p>
+</div>
+</div>
+
+<div class="faq-item bg-white rounded-xl shadow overflow-hidden">
+<button class="w-full flex justify-between items-center p-5 text-left font-semibold" onclick="toggleFaq(this)">
+Do you offer installation or training?
+<i class="fa-solid fa-plus faq-icon"></i>
+</button>
+<div class="faq-answer px-5">
+<p class="text-gray-600 pb-5">Yes, our support team can guide you through setup and basic usage after purchase.</p>
+</div>
+</div>
+
 </div>
 </div>
 </section>
@@ -474,7 +505,7 @@ data-img="https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=700">
 <section class="py-20 bg-gradient-to-r from-blue-900 to-blue-700">
 <div class="max-w-6xl mx-auto px-5 text-center text-white">
 <h2 class="text-5xl font-bold">Music Starts Here 🎹</h2>
-<p class="mt-6 text-xl">Upgrade your church, studio or stage with premium musical instruments and professional audio equipment.</p>
+<p class="mt-6 text-xl">Upgrade your church, studio or stage with genuine Yamaha keyboards and drums.</p>
 <a href="#products" class="inline-block mt-8 bg-white text-blue-900 px-10 py-4 rounded-full font-bold hover:bg-yellow-400 transition">Start Shopping</a>
 </div>
 </section>
@@ -542,20 +573,18 @@ data-img="https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=700">
 
 <div class="bg-gray-50 rounded-xl shadow-lg p-8">
 <h3 class="text-2xl font-bold mb-6">Send Us A Message</h3>
-<form class="space-y-5">
+<form class="space-y-5" onsubmit="return false;">
 <input type="text" placeholder="Full Name" class="w-full border rounded-lg p-4">
 <input type="email" placeholder="Email Address" class="w-full border rounded-lg p-4">
 <input type="tel" placeholder="Phone Number" class="w-full border rounded-lg p-4">
 <select class="w-full border rounded-lg p-4">
 <option>Select Product</option>
-<option>Piano</option>
-<option>Keyboard</option>
-<option>Bass Guitar</option>
-<option>Electric Guitar</option>
-<option>Drums</option>
-<option>Speaker</option>
-<option>Mixer</option>
-<option>Studio Equipment</option>
+<option>Yamaha PSR SX600</option>
+<option>Yamaha PSR SX720</option>
+<option>Yamaha PSR SX900</option>
+<option>Yamaha PSR E583</option>
+<option>Yamaha PSR E483</option>
+<option>Yamaha Drums</option>
 </select>
 <textarea rows="6" placeholder="Type your message..." class="w-full border rounded-lg p-4"></textarea>
 <button class="w-full bg-blue-900 text-white py-4 rounded-lg hover:bg-black">Send Message</button>
@@ -573,7 +602,7 @@ data-img="https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=700">
 <p class="text-blue-100 mt-4">Receive updates on discounts, new arrivals and exclusive offers.</p>
 <div class="flex flex-col md:flex-row mt-8 gap-4">
 <input type="email" placeholder="Enter your email address" class="flex-1 rounded-lg p-4">
-<button class="bg-yellow-400 text-black font-bold px-8 rounded-lg">Subscribe</button>
+<button class="bg-yellow-400 text-black font-bold px-8 rounded-lg py-4 md:py-0">Subscribe</button>
 </div>
 </div>
 </section>
@@ -584,15 +613,15 @@ data-img="https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=700">
 <div class="grid md:grid-cols-4 gap-10">
 <div>
 <h3 class="text-2xl font-bold text-yellow-400">E-Musical Shopping</h3>
-<p class="mt-4 text-gray-400">Your One-Stop Shop For Quality Musical Instruments, Audio Equipment & Accessories.</p>
+<p class="mt-4 text-gray-400">Your One-Stop Shop For Genuine Yamaha Keyboards, Pianos & Drums.</p>
 </div>
 <div>
 <h4 class="font-bold text-lg mb-4">Quick Links</h4>
 <ul class="space-y-2">
-<li><a href="#">Home</a></li>
-<li><a href="#">Shop</a></li>
-<li><a href="#">Categories</a></li>
-<li><a href="#">About</a></li>
+<li><a href="#home">Home</a></li>
+<li><a href="#products">Shop</a></li>
+<li><a href="#bestsellers">Best Sellers</a></li>
+<li><a href="#about">About</a></li>
 <li><a href="#contact">Contact</a></li>
 </ul>
 </div>
@@ -629,6 +658,12 @@ data-img="https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=700">
 class="fixed bottom-6 right-6 w-16 h-16 bg-green-500 rounded-full flex items-center justify-center shadow-2xl hover:scale-110 transition z-40">
 <i class="fab fa-whatsapp text-white text-4xl"></i>
 </a>
+
+<!-- BACK TO TOP -->
+<button id="back-to-top" onclick="window.scrollTo({top:0,behavior:'smooth'})"
+class="fixed bottom-6 left-6 w-12 h-12 bg-blue-900 text-white rounded-full shadow-2xl opacity-0 invisible flex items-center justify-center z-40">
+<i class="fa-solid fa-arrow-up"></i>
+</button>
 
 <!-- CART MODAL -->
 <div id="cart-modal" class="hidden fixed inset-0 z-[100] bg-black/50 flex justify-end">
@@ -685,7 +720,7 @@ function addToCart(e){
   const id = card.dataset.id;
   const name = card.dataset.name;
   const price = Number(card.dataset.price);
-  const img = card.dataset.img;
+  const img = card.querySelector('img').src;
 
   const existing = cart.find(i => i.id === id);
   if(existing){
@@ -794,11 +829,95 @@ function showToast(text){
   }, 2000);
 }
 
-window.addEventListener("scroll", function(){
-  if(window.scrollY > 100){
-    document.querySelector("header").classList.add("shadow-xl");
+// MOBILE MENU
+function toggleMobileMenu(){
+  const menu = document.getElementById('mobile-menu');
+  if(menu.style.maxHeight && menu.style.maxHeight !== '0px'){
+    menu.style.maxHeight = '0px';
   }else{
-    document.querySelector("header").classList.remove("shadow-xl");
+    menu.style.maxHeight = menu.scrollHeight + 'px';
+  }
+}
+
+// SEARCH FILTER
+function filterProducts(){
+  const query = document.getElementById('search-input').value.toLowerCase();
+  const products = document.querySelectorAll('#product-grid .product');
+  let visibleCount = 0;
+
+  products.forEach(p => {
+    const name = p.dataset.name.toLowerCase();
+    if(name.includes(query)){
+      p.classList.remove('hidden');
+      visibleCount++;
+    }else{
+      p.classList.add('hidden');
+    }
+  });
+
+  document.getElementById('no-results').classList.toggle('hidden', visibleCount !== 0);
+}
+
+// CATEGORY FILTER
+function filterByCategory(category){
+  const products = document.querySelectorAll('#product-grid .product');
+  let visibleCount = 0;
+
+  products.forEach(p => {
+    if(category === 'all' || p.dataset.category === category){
+      p.classList.remove('hidden');
+      visibleCount++;
+    }else{
+      p.classList.add('hidden');
+    }
+  });
+
+  document.getElementById('no-results').classList.toggle('hidden', visibleCount !== 0);
+  document.getElementById('products').scrollIntoView({ behavior: 'smooth' });
+}
+
+// SORT
+function sortProducts(){
+  const sortValue = document.getElementById('sort-select').value;
+  const grid = document.getElementById('product-grid');
+  const products = Array.from(grid.querySelectorAll('.product'));
+
+  if(sortValue === 'low-high'){
+    products.sort((a, b) => Number(a.dataset.price) - Number(b.dataset.price));
+  }else if(sortValue === 'high-low'){
+    products.sort((a, b) => Number(b.dataset.price) - Number(a.dataset.price));
+  }else{
+    products.sort((a, b) => Number(a.dataset.id) - Number(b.dataset.id));
+  }
+
+  products.forEach(p => grid.appendChild(p));
+}
+
+// FAQ ACCORDION
+function toggleFaq(button){
+  const item = button.closest('.faq-item');
+  const wasOpen = item.classList.contains('open');
+  document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
+  if(!wasOpen){
+    item.classList.add('open');
+  }
+}
+
+// STICKY HEADER + BACK TO TOP
+window.addEventListener("scroll", function(){
+  const header = document.querySelector("header");
+  const backToTop = document.getElementById('back-to-top');
+
+  if(window.scrollY > 100){
+    header.classList.add("shadow-xl");
+  }else{
+    header.classList.remove("shadow-xl");
+  }
+
+  if(window.scrollY > 400){
+    backToTop.classList.remove('opacity-0', 'invisible');
+  }else{
+    backToTop.classList.add('opacity-0', 'invisible');
   }
 });
 
