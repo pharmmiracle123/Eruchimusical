@@ -7,6 +7,7 @@
 <title>E-Musical Shopping | Nigeria's No.1 Yamaha Instrument Store</title>
 
 <script src="https://cdn.tailwindcss.com"></script>
+<script src="https://js.paystack.co/v1/inline.js"></script>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -36,6 +37,7 @@ scroll-behavior:smooth;
 }
 body{
 background:#f5f5f5;
+overflow-x:hidden;
 }
 .product{
 position:relative;
@@ -47,6 +49,18 @@ box-shadow:0 15px 35px rgba(0,0,0,.15);
 }
 .product img{
 display:block;
+}
+.product .shine{
+position:absolute;
+top:0;left:-75%;
+width:50%;height:100%;
+background:linear-gradient(120deg, transparent, rgba(255,255,255,.5), transparent);
+transform:skewX(-20deg);
+transition:left .6s ease;
+pointer-events:none;
+}
+.product:hover .shine{
+left:130%;
 }
 .menu:hover{
 color:#0047AB;
@@ -78,6 +92,59 @@ overflow:hidden;
 }
 #back-to-top{
 transition:opacity .3s, visibility .3s;
+}
+
+/* EQUALIZER */
+.equalizer{
+display:flex;
+align-items:flex-end;
+gap:4px;
+height:28px;
+}
+.equalizer span{
+display:block;
+width:4px;
+background:#facc15;
+border-radius:2px;
+animation:eq 1s ease-in-out infinite;
+}
+.equalizer span:nth-child(1){animation-delay:0s; height:60%;}
+.equalizer span:nth-child(2){animation-delay:.15s; height:100%;}
+.equalizer span:nth-child(3){animation-delay:.3s; height:40%;}
+.equalizer span:nth-child(4){animation-delay:.45s; height:80%;}
+.equalizer span:nth-child(5){animation-delay:.6s; height:55%;}
+@keyframes eq{
+0%,100%{transform:scaleY(.4);}
+50%{transform:scaleY(1);}
+}
+
+/* FLOATING MUSIC NOTES */
+.notes-bg{
+position:absolute;
+inset:0;
+overflow:hidden;
+pointer-events:none;
+z-index:0;
+}
+.notes-bg i{
+position:absolute;
+color:rgba(255,255,255,.15);
+font-size:2rem;
+animation:floatUp linear infinite;
+}
+@keyframes floatUp{
+0%{transform:translateY(20px) rotate(0deg); opacity:0;}
+10%{opacity:1;}
+90%{opacity:1;}
+100%{transform:translateY(-400px) rotate(30deg); opacity:0;}
+}
+
+.new-badge{
+animation:pulseBadge 1.5s ease-in-out infinite;
+}
+@keyframes pulseBadge{
+0%,100%{transform:scale(1);}
+50%{transform:scale(1.08);}
 }
 </style>
 
@@ -174,20 +241,29 @@ transition:opacity .3s, visibility .3s;
 <ul class="divide-y">
 <li class="p-4 hover:bg-gray-100 cursor-pointer" onclick="filterByCategory('arranger')">🎹 Arranger Keyboards (PSR-SX Series)</li>
 <li class="p-4 hover:bg-gray-100 cursor-pointer" onclick="filterByCategory('portable')">⌨️ Portable Keyboards (PSR-E Series)</li>
-<li class="p-4 hover:bg-gray-100 cursor-pointer" onclick="filterByCategory('drums')">🥁 Yamaha Drums</li>
+<li class="p-4 hover:bg-gray-100 cursor-pointer" onclick="filterByCategory('drums')">🥁 Drum Kits (Yamaha, PDP & Tama)</li>
 <li class="p-4 hover:bg-gray-100 cursor-pointer" onclick="filterByCategory('all')">🛍 View All Products</li>
 </ul>
 </div>
 
 <!-- MAIN BANNER -->
-<div class="lg:col-span-2 bg-gradient-to-r from-blue-900 to-blue-600 rounded-xl overflow-hidden shadow-lg">
-<div class="grid md:grid-cols-2 items-center">
+<div class="lg:col-span-2 relative bg-gradient-to-r from-blue-900 to-blue-600 rounded-xl overflow-hidden shadow-lg">
+<div class="notes-bg">
+<i class="fa-solid fa-music" style="left:10%; animation-duration:6s;"></i>
+<i class="fa-solid fa-drum" style="left:35%; animation-duration:8s; animation-delay:1s;"></i>
+<i class="fa-solid fa-music" style="left:60%; animation-duration:7s; animation-delay:2s;"></i>
+<i class="fa-solid fa-drum" style="left:80%; animation-duration:9s; animation-delay:.5s;"></i>
+</div>
+<div class="relative grid md:grid-cols-2 items-center z-10">
 <div class="p-10 text-white">
 <span class="bg-yellow-400 text-black px-4 py-1 rounded-full text-sm font-semibold">NEW ARRIVALS</span>
 <h1 class="text-4xl md:text-5xl font-bold mt-6">Genuine Yamaha Keyboards & Drums</h1>
-<p class="mt-6 text-lg">From the PSR-E series to the flagship PSR-SX900, plus quality Yamaha drum sets — everything for church, studio and stage.</p>
-<div class="mt-8">
+<p class="mt-6 text-lg">From the PSR-E series to the flagship PSR-SX900, plus PDP, Tama and Yamaha drum kits — everything for church, studio and stage.</p>
+<div class="mt-8 flex items-center gap-6">
 <a href="#products" class="bg-white text-blue-900 px-8 py-4 rounded-lg font-bold hover:bg-yellow-300 transition">Shop Now</a>
+<div class="equalizer">
+<span></span><span></span><span></span><span></span><span></span>
+</div>
 </div>
 </div>
 <div class="h-full">
@@ -210,7 +286,7 @@ transition:opacity .3s, visibility .3s;
 </div>
 <div class="bg-yellow-400 rounded-xl shadow-lg p-6">
 <h3 class="text-xl font-bold">💳 Secure Payment</h3>
-<p class="mt-3">Pay safely via Bank Transfer, POS or Cash.</p>
+<p class="mt-3">Pay instantly online with Card, Bank Transfer or USSD via Paystack.</p>
 </div>
 </div>
 
@@ -228,7 +304,7 @@ transition:opacity .3s, visibility .3s;
 </div>
 <div class="flex items-center gap-4 bg-gray-50 p-5 rounded-xl shadow">
 <i class="fa-solid fa-award text-4xl text-blue-800"></i>
-<div><h4 class="font-bold">100% Genuine</h4><p class="text-sm text-gray-500">Original Yamaha Products</p></div>
+<div><h4 class="font-bold">100% Genuine</h4><p class="text-sm text-gray-500">Original Yamaha, PDP & Tama</p></div>
 </div>
 <div class="flex items-center gap-4 bg-gray-50 p-5 rounded-xl shadow">
 <i class="fa-solid fa-headset text-4xl text-blue-800"></i>
@@ -267,6 +343,7 @@ transition:opacity .3s, visibility .3s;
 
 <div class="product bg-white rounded-xl shadow overflow-hidden" data-category="arranger"
 data-id="1" data-name="Yamaha PSR SX600" data-price="1350000">
+<div class="shine"></div>
 <!-- REPLACE IMAGE: Yamaha PSR SX600 -->
 <img src="/IMG-20260811-WA0228.jpg" class="w-full h-48 object-cover">
 <div class="p-4">
@@ -279,6 +356,7 @@ data-id="1" data-name="Yamaha PSR SX600" data-price="1350000">
 
 <div class="product bg-white rounded-xl shadow overflow-hidden" data-category="arranger"
 data-id="2" data-name="Yamaha PSR SX720" data-price="2200000">
+<div class="shine"></div>
 <span class="absolute top-2 left-2 z-10 bg-blue-600 text-white text-xs px-2 py-1 rounded-lg">POPULAR</span>
 <!-- REPLACE IMAGE: Yamaha PSR SX720 -->
 <img src="/IMG-20260811-WA0229.jpg" class="w-full h-48 object-cover">
@@ -292,6 +370,7 @@ data-id="2" data-name="Yamaha PSR SX720" data-price="2200000">
 
 <div class="product bg-white rounded-xl shadow overflow-hidden" data-category="arranger"
 data-id="3" data-name="Yamaha PSR SX900" data-price="2500000">
+<div class="shine"></div>
 <span class="absolute top-2 left-2 z-10 bg-red-600 text-white text-xs px-2 py-1 rounded-lg">FLAGSHIP</span>
 <!-- REPLACE IMAGE: Yamaha PSR SX900 -->
 <img src="/IMG-20260811-WA0230.jpg" class="w-full h-48 object-cover">
@@ -305,6 +384,7 @@ data-id="3" data-name="Yamaha PSR SX900" data-price="2500000">
 
 <div class="product bg-white rounded-xl shadow overflow-hidden" data-category="portable"
 data-id="4" data-name="Yamaha PSR E583" data-price="720000">
+<div class="shine"></div>
 <!-- REPLACE IMAGE: Yamaha PSR E583 -->
 <img src="/IMG-20260811-WA0239.jpg" class="w-full h-48 object-cover">
 <div class="p-4">
@@ -317,6 +397,7 @@ data-id="4" data-name="Yamaha PSR E583" data-price="720000">
 
 <div class="product bg-white rounded-xl shadow overflow-hidden" data-category="portable"
 data-id="5" data-name="Yamaha PSR E483" data-price="550000">
+<div class="shine"></div>
 <!-- REPLACE IMAGE: Yamaha PSR E483 -->
 <img src="/IMG-20260819-WA0022.jpg" class="w-full h-48 object-cover">
 <div class="p-4">
@@ -329,6 +410,7 @@ data-id="5" data-name="Yamaha PSR E483" data-price="550000">
 
 <div class="product bg-white rounded-xl shadow overflow-hidden" data-category="drums"
 data-id="6" data-name="Yamaha Drums" data-price="300000">
+<div class="shine"></div>
 <!-- REPLACE IMAGE: Yamaha Drums -->
 <img src="/IMG-20260815-WA0076(2).jpg" class="w-full h-48 object-cover">
 <div class="p-4">
@@ -340,12 +422,58 @@ data-id="6" data-name="Yamaha Drums" data-price="300000">
 </div>
 
 <div class="product bg-white rounded-xl shadow overflow-hidden" data-category="drums"
-data-id="6" data-name="Yamaha Drums" data-price="300000">
+data-id="7" data-name="Yamaha Drums" data-price="300000">
+<div class="shine"></div>
 <!-- REPLACE IMAGE: Yamaha Drums -->
 <img src="/IMG-20260815-WA0077(2).jpg" class="w-full h-48 object-cover">
 <div class="p-4">
 <h3 class="font-semibold">Yamaha Drums</h3>
 <p class="text-blue-700 font-bold text-xl mt-2">₦300,000</p>
+<div class="text-yellow-500 mt-2">★★★★★</div>
+<button onclick="addToCart(event)" class="mt-4 w-full bg-blue-800 text-white py-2 rounded-lg hover:bg-black">Add to Cart</button>
+</div>
+</div>
+
+<!-- NEW: PDP 7-Set Drum Kit -->
+<div class="product bg-white rounded-xl shadow overflow-hidden" data-category="drums"
+data-id="8" data-name="PDP 7-Set Drum Kit" data-price="3600000">
+<div class="shine"></div>
+<span class="new-badge absolute top-2 left-2 z-10 bg-green-600 text-white text-xs px-2 py-1 rounded-lg">NEW ARRIVAL</span>
+<!-- REPLACE IMAGE: PDP 7-Set Drum Kit -->
+<img src="https://placehold.co/400x400/111827/ffffff?text=PDP+7-Set+Drum+Kit" class="w-full h-48 object-cover">
+<div class="p-4">
+<h3 class="font-semibold">PDP 7-Set Drum Kit</h3>
+<p class="text-blue-700 font-bold text-xl mt-2">₦3,600,000</p>
+<div class="text-yellow-500 mt-2">★★★★★</div>
+<button onclick="addToCart(event)" class="mt-4 w-full bg-blue-800 text-white py-2 rounded-lg hover:bg-black">Add to Cart</button>
+</div>
+</div>
+
+<!-- NEW: PDP 5-Set Drum Kit -->
+<div class="product bg-white rounded-xl shadow overflow-hidden" data-category="drums"
+data-id="9" data-name="PDP 5-Set Drum Kit" data-price="2550000">
+<div class="shine"></div>
+<span class="new-badge absolute top-2 left-2 z-10 bg-green-600 text-white text-xs px-2 py-1 rounded-lg">NEW ARRIVAL</span>
+<!-- REPLACE IMAGE: PDP 5-Set Drum Kit -->
+<img src="https://placehold.co/400x400/111827/ffffff?text=PDP+5-Set+Drum+Kit" class="w-full h-48 object-cover">
+<div class="p-4">
+<h3 class="font-semibold">PDP 5-Set Drum Kit</h3>
+<p class="text-blue-700 font-bold text-xl mt-2">₦2,550,000</p>
+<div class="text-yellow-500 mt-2">★★★★★</div>
+<button onclick="addToCart(event)" class="mt-4 w-full bg-blue-800 text-white py-2 rounded-lg hover:bg-black">Add to Cart</button>
+</div>
+</div>
+
+<!-- NEW: Tama 5-Set Drum Kit -->
+<div class="product bg-white rounded-xl shadow overflow-hidden" data-category="drums"
+data-id="10" data-name="Tama 5-Set Drum Kit" data-price="1900000">
+<div class="shine"></div>
+<span class="new-badge absolute top-2 left-2 z-10 bg-green-600 text-white text-xs px-2 py-1 rounded-lg">NEW ARRIVAL</span>
+<!-- REPLACE IMAGE: Tama 5-Set Drum Kit -->
+<img src="https://placehold.co/400x400/111827/ffffff?text=Tama+5-Set+Drum+Kit" class="w-full h-48 object-cover">
+<div class="p-4">
+<h3 class="font-semibold">Tama 5-Set Drum Kit</h3>
+<p class="text-blue-700 font-bold text-xl mt-2">₦1,900,000</p>
 <div class="text-yellow-500 mt-2">★★★★★</div>
 <button onclick="addToCart(event)" class="mt-4 w-full bg-blue-800 text-white py-2 rounded-lg hover:bg-black">Add to Cart</button>
 </div>
@@ -389,13 +517,13 @@ data-id="6" data-name="Yamaha Drums" data-price="300000">
 </div>
 
 <div class="bg-gray-50 rounded-xl shadow-lg overflow-hidden">
-<!-- REPLACE IMAGE: Yamaha Drums (best seller) -->
-<img src="/IMG-20260815-WA0077(2).jpg" class="w-full h-56 object-cover">
+<!-- REPLACE IMAGE: PDP 7-Set Drum Kit (best seller) -->
+<img src="https://placehold.co/400x400/111827/ffffff?text=PDP+7-Set+Drum+Kit" class="w-full h-56 object-cover">
 <div class="p-5">
 <span class="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-xs">NEW</span>
-<h3 class="font-bold mt-3">Yamaha Drums</h3>
-<p class="text-blue-800 font-bold text-2xl mt-2">₦300,000</p>
-<div class="text-yellow-500 mt-2">★★★★★ (87)</div>
+<h3 class="font-bold mt-3">PDP 7-Set Drum Kit</h3>
+<p class="text-blue-800 font-bold text-2xl mt-2">₦3,600,000</p>
+<div class="text-yellow-500 mt-2">★★★★★ (12)</div>
 </div>
 </div>
 
@@ -413,8 +541,8 @@ data-id="6" data-name="Yamaha Drums" data-price="300000">
 <div class="grid md:grid-cols-4 gap-8">
 <div class="text-center p-8 rounded-xl shadow-lg bg-white">
 <div class="text-6xl text-blue-800 mb-5">🎼</div>
-<h3 class="font-bold text-xl">100% Genuine Yamaha</h3>
-<p class="text-gray-600 mt-3">Only authentic products, no fakes.</p>
+<h3 class="font-bold text-xl">100% Genuine Brands</h3>
+<p class="text-gray-600 mt-3">Yamaha, PDP & Tama — no fakes.</p>
 </div>
 <div class="text-center p-8 rounded-xl shadow-lg bg-white">
 <div class="text-6xl text-blue-800 mb-5">🚚</div>
@@ -424,7 +552,7 @@ data-id="6" data-name="Yamaha Drums" data-price="300000">
 <div class="text-center p-8 rounded-xl shadow-lg bg-white">
 <div class="text-6xl text-blue-800 mb-5">💳</div>
 <h3 class="font-bold text-xl">Secure Payments</h3>
-<p class="text-gray-600 mt-3">Bank Transfer, POS and Cash options available.</p>
+<p class="text-gray-600 mt-3">Pay online instantly via Card, Bank Transfer or USSD (Paystack).</p>
 </div>
 <div class="text-center p-8 rounded-xl shadow-lg bg-white">
 <div class="text-6xl text-blue-800 mb-5">🛠️</div>
@@ -471,11 +599,11 @@ data-id="6" data-name="Yamaha Drums" data-price="300000">
 
 <div class="faq-item bg-white rounded-xl shadow overflow-hidden">
 <button class="w-full flex justify-between items-center p-5 text-left font-semibold" onclick="toggleFaq(this)">
-Are your Yamaha instruments genuine?
+Are your instruments genuine?
 <i class="fa-solid fa-plus faq-icon"></i>
 </button>
 <div class="faq-answer px-5">
-<p class="text-gray-600 pb-5">Yes, all our Yamaha keyboards and drums are 100% genuine and sourced from authorized channels.</p>
+<p class="text-gray-600 pb-5">Yes, all our Yamaha, PDP and Tama products are 100% genuine and sourced from authorized channels.</p>
 </div>
 </div>
 
@@ -495,7 +623,7 @@ What payment methods do you accept?
 <i class="fa-solid fa-plus faq-icon"></i>
 </button>
 <div class="faq-answer px-5">
-<p class="text-gray-600 pb-5">We accept Bank Transfer, POS and Cash payments.</p>
+<p class="text-gray-600 pb-5">We accept secure online payments via Paystack — Card, Bank Transfer and USSD — as well as Cash on delivery.</p>
 </div>
 </div>
 
@@ -516,8 +644,8 @@ Do you offer installation or training?
 <!-- ================= PROMO BANNER ================= -->
 <section class="py-20 bg-gradient-to-r from-blue-900 to-blue-700">
 <div class="max-w-6xl mx-auto px-5 text-center text-white">
-<h2 class="text-5xl font-bold">Music Starts Here 🎹</h2>
-<p class="mt-6 text-xl">Upgrade your church, studio or stage with genuine Yamaha keyboards and drums.</p>
+<h2 class="text-5xl font-bold">Music Starts Here 🎹🥁</h2>
+<p class="mt-6 text-xl">Upgrade your church, studio or stage with genuine Yamaha keyboards and PDP/Tama drum kits.</p>
 <a href="#products" class="inline-block mt-8 bg-white text-blue-900 px-10 py-4 rounded-full font-bold hover:bg-yellow-400 transition">Start Shopping</a>
 </div>
 </section>
@@ -562,24 +690,22 @@ Do you offer installation or training?
 <h3 class="text-xl font-bold mb-5">Accepted Payment Methods</h3>
 <div class="grid grid-cols-3 gap-4">
 <div class="border rounded-lg p-4 text-center">
+<i class="fas fa-credit-card text-3xl text-purple-600"></i>
+<p class="mt-2">Card / Paystack</p>
+</div>
+<div class="border rounded-lg p-4 text-center">
 <i class="fas fa-university text-3xl text-blue-700"></i>
-<p class="mt-2">Transfer</p>
+<p class="mt-2">Bank Transfer</p>
 </div>
 <div class="border rounded-lg p-4 text-center">
 <i class="fas fa-money-bill-wave text-3xl text-green-600"></i>
 <p class="mt-2">Cash</p>
 </div>
-<div class="border rounded-lg p-4 text-center">
-<i class="fas fa-credit-card text-3xl text-purple-600"></i>
-<p class="mt-2">POS</p>
-</div>
 </div>
 
 <div class="bg-blue-900 text-white rounded-xl p-6 mt-8">
-<h4 class="font-bold text-xl mb-3">Bank Details</h4>
-<p><strong>Bank:</strong> OPay</p>
-<p><strong>Account Name:</strong><br>ERUCHI JOHN SUNDAY</p>
-<p><strong>Account Number:</strong><br>6434550034</p>
+<h4 class="font-bold text-xl mb-3"><i class="fa-solid fa-lock mr-2"></i>Secure Online Payment</h4>
+<p>Pay instantly and securely with your Debit/Credit Card, Bank Transfer or USSD — powered by Paystack. No need to send manual transfers.</p>
 </div>
 </div>
 
@@ -597,6 +723,9 @@ Do you offer installation or training?
 <option>Yamaha PSR E583</option>
 <option>Yamaha PSR E483</option>
 <option>Yamaha Drums</option>
+<option>PDP 7-Set Drum Kit</option>
+<option>PDP 5-Set Drum Kit</option>
+<option>Tama 5-Set Drum Kit</option>
 </select>
 <textarea rows="6" placeholder="Type your message..." class="w-full border rounded-lg p-4"></textarea>
 <button class="w-full bg-blue-900 text-white py-4 rounded-lg hover:bg-black">Send Message</button>
@@ -625,7 +754,7 @@ Do you offer installation or training?
 <div class="grid md:grid-cols-4 gap-10">
 <div>
 <h3 class="text-2xl font-bold text-yellow-400">E-Musical Shopping</h3>
-<p class="mt-4 text-gray-400">Your One-Stop Shop For Genuine Yamaha Keyboards, Pianos & Drums.</p>
+<p class="mt-4 text-gray-400">Your One-Stop Shop For Genuine Yamaha, PDP & Tama Instruments.</p>
 </div>
 <div>
 <h4 class="font-bold text-lg mb-4">Quick Links</h4>
@@ -693,8 +822,12 @@ class="fixed bottom-6 left-6 w-12 h-12 bg-blue-900 text-white rounded-full shado
 <span>Total:</span>
 <span id="cart-total">₦0</span>
 </div>
-<button onclick="checkoutWhatsApp()" class="w-full bg-green-500 text-white py-4 rounded-lg font-bold hover:bg-green-600 flex items-center justify-center gap-2">
-<i class="fa-brands fa-whatsapp text-2xl"></i> Checkout via WhatsApp
+<input type="email" id="checkout-email" placeholder="Enter your email for receipt" class="w-full border rounded-lg p-3 mb-3" required>
+<button onclick="payWithPaystack()" class="w-full bg-blue-800 text-white py-4 rounded-lg font-bold hover:bg-black flex items-center justify-center gap-2">
+<i class="fa-solid fa-lock"></i> Pay Now with Paystack
+</button>
+<button onclick="checkoutWhatsApp()" class="w-full mt-3 bg-green-500 text-white py-3 rounded-lg font-bold hover:bg-green-600 flex items-center justify-center gap-2">
+<i class="fa-brands fa-whatsapp text-xl"></i> Or Order via WhatsApp
 </button>
 <button onclick="closeCart()" class="w-full mt-3 border border-gray-300 py-3 rounded-lg hover:bg-gray-100">Continue Shopping</button>
 </div>
@@ -709,6 +842,8 @@ class="fixed bottom-6 left-6 w-12 h-12 bg-blue-900 text-white rounded-full shado
 
 <!-- SCRIPT -->
 <script>
+
+const PAYSTACK_PUBLIC_KEY = 'pk_live_1360dbbf248bd92c3afcb1b2b9a132f13f941d83';
 
 let cart = JSON.parse(localStorage.getItem('emc_cart') || '[]');
 
@@ -814,6 +949,53 @@ function openCart(){
 function closeCart(){
   document.getElementById('cart-modal').classList.add('hidden');
   document.body.classList.remove('overflow-hidden');
+}
+
+function payWithPaystack(){
+  if(cart.length === 0) return;
+
+  const emailInput = document.getElementById('checkout-email');
+  const email = emailInput.value.trim();
+
+  if(!email || !email.includes('@')){
+    showToast('Please enter a valid email to continue');
+    emailInput.focus();
+    return;
+  }
+
+  const amountInKobo = cartTotal() * 100;
+  const ref = 'EMC-' + Date.now();
+
+  const handler = PaystackPop.setup({
+    key: PAYSTACK_PUBLIC_KEY,
+    email: email,
+    amount: amountInKobo,
+    currency: 'NGN',
+    ref: ref,
+    metadata: {
+      custom_fields: [
+        {
+          display_name: "Order Items",
+          variable_name: "order_items",
+          value: cart.map(i => `${i.name} x${i.qty}`).join(', ')
+        }
+      ]
+    },
+    callback: function(response){
+      // Client-side success only. For real fulfillment, verify this reference
+      // server-side (e.g. a Firebase Cloud Function calling Paystack's
+      // /transaction/verify endpoint) before treating the order as paid.
+      showToast('Payment successful! Ref: ' + response.reference);
+      cart = [];
+      saveCart();
+      closeCart();
+    },
+    onClose: function(){
+      showToast('Payment window closed');
+    }
+  });
+
+  handler.openIframe();
 }
 
 function checkoutWhatsApp(){
