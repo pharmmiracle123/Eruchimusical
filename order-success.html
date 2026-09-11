@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Order Confirmed | Eruchi Musicals</title>
+
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;900&family=Jost:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"/>
+
+<script>
+tailwind.config={
+  theme:{
+    extend:{
+      colors:{ navy:"#1E3A8A", gold:"#C9A24B", cream:"#F5F7FB", charcoal:"#151B2B" },
+      fontFamily:{ serif:['"Playfair Display"','serif'], sans:['Jost','sans-serif'] }
+    }
+  }
+}
+</script>
+
+<style>
+*{box-sizing:border-box;font-family:'Jost',sans-serif;}
+.serif{font-family:'Playfair Display',serif;}
+body{background:#F5F7FB;}
+.spinner{border:3px solid #eee;border-top:3px solid #1E3A8A;border-radius:50%;width:36px;height:36px;animation:spin .8s linear infinite;}
+@keyframes spin{100%{transform:rotate(360deg);}}
+</style>
+</head>
+
+<body class="min-h-screen flex items-center justify-center px-5">
+
+<div class="bg-white rounded-2xl shadow-xl border border-gold/30 p-8 max-w-md w-full text-center">
+
+  <div id="state-loading">
+    <div class="spinner mx-auto mb-5"></div>
+    <p class="text-gray-500">Confirming your order...</p>
+  </div>
+
+  <div id="state-success" class="hidden">
+    <div class="w-16 h-16 mx-auto mb-5 rounded-full bg-green-100 flex items-center justify-center text-green-600 text-3xl">
+      <i class="fa-solid fa-check"></i>
+    </div>
+    <h1 class="serif text-2xl font-bold mb-2">Payment Successful!</h1>
+    <p class="text-gray-600 mb-1">Thank you for shopping with Eruchi Musicals.</p>
+    <p class="text-sm text-gray-400 mb-5">Reference: <span id="ref-text" class="font-mono"></span></p>
+
+    <div id="order-summary" class="text-left bg-gold/5 rounded-xl p-4 mb-6 text-sm"></div>
+
+    <p class="text-sm text-gray-500 mb-6">Your order has been recorded. We'll reach out to arrange delivery — you can also message us on <a href="https://wa.me/2349138530296" class="text-navy underline">WhatsApp</a> with your reference above.</p>
+
+    <a href="index.html" class="inline-block w-full bg-navy text-white py-4 rounded-lg font-bold hover:bg-black transition">
+      Continue Shopping
+    </a>
+  </div>
+
+  <div id="state-noref" class="hidden">
+    <div class="w-16 h-16 mx-auto mb-5 rounded-full bg-yellow-100 flex items-center justify-center text-yellow-600 text-3xl">
+      <i class="fa-solid fa-triangle-exclamation"></i>
+    </div>
+    <h1 class="serif text-2xl font-bold mb-2">No Payment Detected</h1>
+    <p class="text-gray-600 mb-6">We couldn't find a payment reference on this page. If you completed a payment, please contact us with your reference number.</p>
+    <a href="index.html" class="inline-block w-full bg-navy text-white py-4 rounded-lg font-bold hover:bg-black transition">
+      Back to Home
+    </a>
+  </div>
+
+</div>
+
+<script>
+function formatNaira(num){ return '₦' + Number(num).toLocaleString('en-NG'); }
+
+function getParam(name){
+  const params = new URLSearchParams(window.location.search);
+  return params.get(name);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  // Paystack appends either ?reference=xxx or ?trxref=xxx&reference=xxx
+  const reference = getParam('reference') || getParam('trxref');
+
+  const loadingEl = document.getElementById('state-loading');
+  const successEl = document.getElementById('state-success');
+  const noRefEl = document.getElementById('state-noref');
+
+  if(!reference){
+    loadingEl.classList.add('hidden');
+    noRefEl.classList.remove('hidden');
+    return;
+  }
+
+  document.getElementById('ref-text').textContent = reference;
+
+  // The storefront already saved this order to Firestore inside the
+  // Paystack callback before redirecting here — this page just reads
+  // back the locally stashed copy to show a summary, no re-save needed.
+  const lastOrderRaw = localStorage.getItem('em_last_order');
+  const lastOrder = lastOrderRaw ? JSON.parse(lastOrderRaw) : null;
+
+  if(lastOrder && lastOrder.paystackRef === reference){
+    const itemsHTML = lastOrder.items.map(i =>
+      `<div class="flex justify-between py-1"><span>${i.name} x${i.qty}</span><span>${formatNaira(i.price * i.qty)}</span></div>`
+    ).join('');
+    document.getElementById('order-summary').innerHTML = `
+      ${itemsHTML}
+      <div class="flex justify-between font-bold pt-2 mt-2 border-t border-gold/20">
+        <span>Total</span><span>${formatNaira(lastOrder.totalAmount)}</span>
+      </div>
+    `;
+  } else {
+    document.getElementById('order-summary').innerHTML = `<p class="text-gray-500">Order details unavailable, but your reference has been recorded.</p>`;
+  }
+
+  // Clean up now that checkout is complete
+  localStorage.removeItem('em_last_order');
+
+  loadingEl.classList.add('hidden');
+  successEl.classList.remove('hidden');
+});
+</script>
+
+</body>
+  </html>r
