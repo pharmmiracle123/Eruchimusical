@@ -46,7 +46,6 @@
     @keyframes slide { from { transform: translateX(100%); } to { transform: translateX(0); } }
     .product-img-ph { background: linear-gradient(135deg, rgba(30,58,138,.08), rgba(192,133,82,.15)); }
 
-    /* ===== Floating action button ===== */
     .fab { position: fixed; z-index: 60; width: 60px; height: 60px; border-radius: 999px; display: flex; align-items: center; justify-content: center; font-size: 24px; box-shadow: 0 10px 25px rgba(0,0,0,.25); transition: transform .2s; }
     .fab:hover { transform: scale(1.07); }
     #support-fab { right: 20px; bottom: 20px; background: #1E3A8A; color: #fff; }
@@ -57,7 +56,6 @@
     #back-to-top { position: fixed; right: 24px; bottom: 92px; z-index: 60; width: 42px; height: 42px; border-radius: 999px; background: #151B2B; color: #fff; display: none; align-items: center; justify-content: center; box-shadow: 0 8px 20px rgba(0,0,0,.25); }
     #back-to-top.show { display: flex; }
 
-    /* ===== Testimonials & recently-viewed ===== */
     .testimonial-card { background: #fff; border-radius: 1rem; box-shadow: 0 8px 20px rgba(0,0,0,.06); padding: 1.75rem; height: 100%; display: flex; flex-direction: column; }
     .testimonial-avatar { width: 44px; height: 44px; border-radius: 999px; background: #1E3A8A; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; flex-shrink: 0; }
     .scroll-row { display: flex; gap: 1.25rem; overflow-x: auto; padding-bottom: .5rem; scroll-snap-type: x mandatory; }
@@ -68,6 +66,7 @@
     .stock-badge { position: absolute; bottom: 2px; left: 2px; z-index: 10; background: #DC2626; color: #fff; font-size: 10px; padding: 2px 8px; border-radius: 6px; }
     .qty-box { display: flex; align-items: center; gap: .5rem; }
     .qty-box button { width: 32px; height: 32px; border: 1px solid #ddd; border-radius: 8px; background: #fff; }
+    #pay-btn:disabled { opacity: .6; }
   </style>
 </head>
 <body>
@@ -257,9 +256,7 @@
 
   <!-- ============================================================ -->
   <!-- TESTIMONIALS -->
-  <!-- SAMPLE CONTENT ONLY — replace with real customer reviews      -->
-  <!-- before this page goes live. Edit the TESTIMONIALS array in   -->
-  <!-- the script below.                                             -->
+  <!-- SAMPLE CONTENT ONLY — replace with real customer reviews before publishing. -->
   <!-- ============================================================ -->
   <section id="testimonials" class="py-20 bg-cream">
     <div class="max-w-7xl mx-auto px-5">
@@ -475,7 +472,7 @@
         <div id="discount-row" class="hidden flex justify-between text-green-600"><span>Discount</span><b id="cart-discount">₦0</b></div>
         <div class="flex justify-between"><span>Delivery Fee</span><b id="cart-delivery">₦0</b></div>
         <div class="flex justify-between text-xl font-bold mt-2 mb-4"><span>Total</span><span id="cart-total">₦0</span></div>
-        <button onclick="payWithPaystack()" class="w-full bg-navy text-white py-4 rounded-lg font-bold">🔒 Pay with Paystack</button>
+        <button id="pay-btn" onclick="payWithPaystack()" class="w-full bg-navy text-white py-4 rounded-lg font-bold">🔒 Pay with Paystack</button>
       </div>
     </div>
   </div>
@@ -580,7 +577,6 @@
     const RECENTLY_VIEWED_MAX = 8;
     const LOW_STOCK_THRESHOLD = 5;
 
-    // Delivery fee per state (₦). Adjust freely from the admin side later if needed.
     const DELIVERY_FEES = {
       "Lagos": 2000, "Ogun": 2500, "Oyo": 3000, "Osun": 3000, "Ondo": 3000, "Ekiti": 3000,
       "Abuja (FCT)": 3500, "Benue": 4000, "Kogi": 4000, "Kwara": 3500, "Nasarawa": 4000, "Niger": 4000, "Plateau": 4000,
@@ -609,6 +605,7 @@
     let productOrder = [];
     let chatUnsub = null;
     let searchDebounceTimer = null;
+    let paying = false;
 
     // ------------------------------------------------------------
     // HELPERS
@@ -645,8 +642,6 @@
       const status = document.getElementById("firebase-status");
       loading.classList.remove("hidden");
 
-      // IMPORTANT: Do NOT require createdAt. Products created by older
-      // versions of the admin dashboard may not contain that field.
       try {
         f.onSnapshot(f.collection(f.db, "products"), snap => {
           loading.classList.add("hidden");
@@ -658,7 +653,6 @@
             productOrder.push(s.id);
           });
 
-          // Sort safely in JavaScript — missing createdAt is allowed.
           productOrder.sort((a, b) => {
             const ta = liveProducts[a].createdAt?.seconds || liveProducts[a].createdAt || 0;
             const tb = liveProducts[b].createdAt?.seconds || liveProducts[b].createdAt || 0;
@@ -695,7 +689,6 @@
     // STOCK HELPERS
     // ------------------------------------------------------------
     function stockOf(p) {
-      // If a product has no `stock` field at all, treat it as unlimited/unknown.
       return (p.stock === undefined || p.stock === null || p.stock === "") ? null : Number(p.stock);
     }
     function isSoldOut(p) {
@@ -1001,7 +994,7 @@
     function closeQuickView() { document.getElementById("quickview-modal").classList.add("hidden"); }
 
     // ------------------------------------------------------------
-    // CHECKOUT: PAYSTACK
+    // CHECKOUT: PAYSTACK (with automatic subaccount fallback)
     // ------------------------------------------------------------
     async function saveOrder(order) {
       if (!window._firebase) return;
@@ -1015,7 +1008,62 @@
       } catch (e) { console.error(e); }
     }
 
+    function finishOrder(reference, splitApplied, ctx) {
+      const order = {
+        items: ctx.items, customerName: ctx.name, customerPhone: ctx.phone, customerEmail: ctx.email,
+        deliveryAddress: ctx.address, deliveryState: ctx.state, deliveryFee: deliveryFee(),
+        totalAmount: ctx.amount, paystackRef: reference, splitApplied
+      };
+      saveOrder(order);
+      orderHistory.push({ ...order, ref: reference, createdAt: Date.now() });
+      saveOrderHistory();
+      localStorage.setItem("em_last_order", JSON.stringify(order));
+      cart = [];
+      appliedDiscount = 0;
+      saveCart();
+      closeCart();
+      location.href = "success.html?ref=" + encodeURIComponent(reference);
+    }
+
+    function launchPaystack(useSubaccount, ctx) {
+      const payBtn = document.getElementById("pay-btn");
+      const config = {
+        key: PAYSTACK_PUBLIC_KEY,
+        email: ctx.email,
+        amount: ctx.amount * 100,
+        currency: "NGN",
+        ref: ctx.ref,
+        metadata: {
+          custom_fields: [
+            { display_name: "Order Items", variable_name: "order_items", value: ctx.items.map(i => i.name + " x" + i.qty).join(", ") },
+            { display_name: "Customer Name", variable_name: "customer_name", value: ctx.name },
+            { display_name: "Phone", variable_name: "phone", value: ctx.phone },
+            { display_name: "Delivery Address", variable_name: "delivery_address", value: ctx.address + ", " + ctx.state }
+          ]
+        },
+        callback: r => { paying = false; if (payBtn) payBtn.disabled = false; finishOrder(r.reference, useSubaccount, ctx); },
+        onClose: () => { paying = false; if (payBtn) payBtn.disabled = false; toast("Payment window closed"); }
+      };
+      if (useSubaccount) config.subaccount = PAYSTACK_SUBACCOUNT;
+
+      try {
+        const h = PaystackPop.setup(config);
+        h.openIframe();
+      } catch (err) {
+        console.error("Paystack setup failed" + (useSubaccount ? " WITH subaccount" : " (no subaccount)") + ":", err);
+        if (useSubaccount) {
+          console.warn("Retrying checkout without the subaccount split. Verify " + PAYSTACK_SUBACCOUNT + " exists and is active under the same Paystack account as the public key.");
+          launchPaystack(false, ctx);
+        } else {
+          paying = false;
+          if (payBtn) payBtn.disabled = false;
+          toast("Payment could not start. Please try again or contact support.");
+        }
+      }
+    }
+
     function payWithPaystack() {
+      if (paying) return;
       if (!cart.length) return toast("Your cart is empty");
 
       const name = document.getElementById("checkout-name").value.trim();
@@ -1028,48 +1076,24 @@
       if (!state) return toast("Please select your delivery state");
       if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return toast("Enter a valid email");
 
-      const ref = "EM-" + Date.now();
-      const items = cart.map(i => ({ name: i.name, price: i.price, qty: i.qty, imageUrl: i.imageUrl || "" }));
-      const amount = total();
+      if (typeof PaystackPop === "undefined" || typeof PaystackPop.setup !== "function") {
+        return toast("Paystack failed to load. Check your internet connection and reload the page.");
+      }
 
-      if (!window.PaystackPop) return toast("Paystack failed to load");
+      const ctx = {
+        name, phone, address, state, email,
+        items: cart.map(i => ({ name: i.name, price: i.price, qty: i.qty, imageUrl: i.imageUrl || "" })),
+        amount: total(),
+        ref: "EM-" + Date.now()
+      };
 
-      const h = PaystackPop.setup({
-        key: PAYSTACK_PUBLIC_KEY,
-        subaccount: PAYSTACK_SUBACCOUNT,
-        email,
-        amount: amount * 100,
-        currency: "NGN",
-        ref,
-        metadata: {
-          custom_fields: [
-            { display_name: "Order Items", variable_name: "order_items", value: cart.map(i => i.name + " x" + i.qty).join(", ") },
-            { display_name: "Customer Name", variable_name: "customer_name", value: name },
-            { display_name: "Phone", variable_name: "phone", value: phone },
-            { display_name: "Delivery Address", variable_name: "delivery_address", value: address + ", " + state }
-          ]
-        },
-        callback: async r => {
-          const order = {
-            items, customerName: name, customerPhone: phone, customerEmail: email,
-            deliveryAddress: address, deliveryState: state, deliveryFee: deliveryFee(),
-            totalAmount: amount, paystackRef: r.reference
-          };
-          await saveOrder(order);
+      if (!Number.isFinite(ctx.amount) || ctx.amount <= 0) return toast("Cart total looks invalid — please refresh and try again");
 
-          orderHistory.push({ ...order, ref: r.reference, createdAt: Date.now() });
-          saveOrderHistory();
+      paying = true;
+      const payBtn = document.getElementById("pay-btn");
+      if (payBtn) payBtn.disabled = true;
 
-          localStorage.setItem("em_last_order", JSON.stringify(order));
-          cart = [];
-          appliedDiscount = 0;
-          saveCart();
-          closeCart();
-          location.href = "success.html?ref=" + encodeURIComponent(r.reference);
-        },
-        onClose: () => toast("Payment window closed")
-      });
-      h.openIframe();
+      launchPaystack(true, ctx);
     }
 
     // ------------------------------------------------------------
