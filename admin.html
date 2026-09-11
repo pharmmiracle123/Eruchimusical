@@ -13,13 +13,21 @@
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
   import {
+    getAuth,
+    signInWithEmailAndPassword,
+    onAuthStateChanged,
+    signOut
+  } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+  import {
     getFirestore, collection, addDoc, getDocs, doc,
     updateDoc, deleteDoc, orderBy, query, serverTimestamp,
     onSnapshot, arrayUnion
   } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-  // ⚠️ REPLACE with Eruchi Musicals' OWN Firebase project config (same project as the storefront)
-  const firebaseConfig = {
+  // Firebase project config — use the SAME Firebase project as index.html/login.html
+    // ⚠️ REPLACE with Eruchi Musicals' OWN Firebase project config
+  
+const firebaseConfig = {
   apiKey: "AIzaSyDC49oGcE3EAXSjjJ1mstpowbpjaaY8PTc",
   authDomain: "mcode-sales.firebaseapp.com",
   projectId: "mcode-sales",
@@ -29,11 +37,11 @@
   appId: "1:823876737976:web:45245a0fef4f5094dd0d4d"
 };
 
-
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
+  const auth = getAuth(app);
 
-  window._firebase = { db, collection, addDoc, getDocs, doc, updateDoc, deleteDoc, orderBy, query, serverTimestamp, onSnapshot, arrayUnion };
+  window._firebase = { auth, signInWithEmailAndPassword, onAuthStateChanged, signOut, db, collection, addDoc, getDocs, doc, updateDoc, deleteDoc, orderBy, query, serverTimestamp, onSnapshot, arrayUnion };
   window._firebaseReady = true;
   document.dispatchEvent(new Event('firebase-ready'));
 </script>
@@ -117,13 +125,16 @@ body{background:#F5F7FB;}
   <div class="bg-white rounded-2xl shadow-xl p-8 max-w-sm w-full border border-gold/30">
     <h1 class="serif text-3xl font-bold text-center mb-1">Eruchi Musicals</h1>
     <p class="text-center text-sm text-navy uppercase tracking-widest mb-8">Admin Access</p>
-    <input type="password" id="admin-password" placeholder="Enter admin password"
-      class="w-full border border-gold/40 rounded-lg p-4 mb-4 outline-none focus:border-navy"
-      onkeydown="if(event.key==='Enter') checkPassword()">
-    <button onclick="checkPassword()" class="w-full bg-navy text-white py-4 rounded-lg font-bold hover:bg-black transition">
-      Log In
-    </button>
-    <p id="login-error" class="text-red-600 text-sm text-center mt-4 hidden">Incorrect password. Try again.</p>
+    <form id="admin-login-form" onsubmit="return checkPassword(event)">
+      <input type="email" id="admin-email" placeholder="Admin email" autocomplete="username" required
+        class="w-full border border-gold/40 rounded-lg p-4 mb-3 outline-none focus:border-navy">
+      <input type="password" id="admin-password" placeholder="Password" autocomplete="current-password" required
+        class="w-full border border-gold/40 rounded-lg p-4 mb-4 outline-none focus:border-navy">
+      <button type="submit" id="login-btn" class="w-full bg-navy text-white py-4 rounded-lg font-bold hover:bg-black transition">
+        Log In
+      </button>
+    </form>
+    <p id="login-error" class="text-red-600 text-sm text-center mt-4 hidden"></p>
   </div>
 </div>
 
@@ -379,12 +390,18 @@ body{background:#F5F7FB;}
 
 <script>
 // ============================================================
-// ⚠️ SET YOUR ADMIN PASSWORD HERE
+// FIREBASE ADMIN AUTHENTICATION
 // ============================================================
-const ADMIN_PASSWORD = "EruchiAdmin2026";
+// These emails must also be the admin emails allowed in your
+// Firestore Security Rules. Create these accounts in Firebase
+// Authentication > Users.
+const ADMIN_EMAILS = [
+  "onyekamiracle08@gmail.com",
+  "emusic20official@gmail.com"
+];
 
-
-// ⚠️ CLOUDINARY CONFIG
+// ============================================================
+// CLOUDINARY CONFIG
 // ============================================================
 const CLOUDINARY_CLOUD_NAME = "xhkfiry2";
 const CLOUDINARY_UPLOAD_PRESET = "Project1";
@@ -393,19 +410,74 @@ const CLOUDINARY_UPLOAD_URL = `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOU
 let editingId = null;
 let deleteTargetId = null;
 let selectedImageFile = null;
+let adminAuthInitialized = false;
+let dashboardStarted = false;
 
-function checkPassword(){
-  const input = document.getElementById('admin-password').value;
-  if(input === ADMIN_PASSWORD){
-    sessionStorage.setItem('em_admin_auth', 'true');
-    showDashboard();
-  } else {
-    document.getElementById('login-error').classList.remove('hidden');
-  }
+function normalizeEmail(email){
+  return String(email || '').trim().toLowerCase();
 }
 
-function logout(){
-  sessionStorage.removeItem('em_admin_auth');
+function isAllowedAdmin(user){
+  return !!user && ADMIN_EMAILS.includes(normalizeEmail(user.email));
+}
+
+async function checkPassword(event){
+  if(event) event.preventDefault();
+
+  const email = normalizeEmail(document.getElementById('admin-email').value);
+  const password = document.getElementById('admin-password').value;
+  const errorEl = document.getElementById('login-error');
+  const loginBtn = document.getElementById('login-btn');
+
+  errorEl.classList.add('hidden');
+  errorEl.textContent = '';
+
+  if(!email || !password){
+    errorEl.textContent = 'Enter your admin email and password.';
+    errorEl.classList.remove('hidden');
+    return false;
+  }
+
+  if(!ADMIN_EMAILS.includes(email)){
+    errorEl.textContent = 'This email is not authorized for admin access.';
+    errorEl.classList.remove('hidden');
+    return false;
+  }
+
+  loginBtn.disabled = true;
+  loginBtn.textContent = 'Signing in...';
+
+  try{
+    const { auth, signInWithEmailAndPassword } = window._firebase;
+    await signInWithEmailAndPassword(auth, email, password);
+    // onAuthStateChanged performs the final authorization check.
+  }catch(err){
+    console.error(err);
+    let message = 'Login failed. Please check your email and password.';
+    if(err.code === 'auth/invalid-credential' || err.code === 'auth/wrong-password' || err.code === 'auth/user-not-found'){
+      message = 'Invalid admin email or password.';
+    }else if(err.code === 'auth/too-many-requests'){
+      message = 'Too many attempts. Please wait and try again.';
+    }else if(err.code === 'auth/network-request-failed'){
+      message = 'Network error. Check your internet connection.';
+    }
+    errorEl.textContent = message;
+    errorEl.classList.remove('hidden');
+  }finally{
+    loginBtn.disabled = false;
+    loginBtn.textContent = 'Log In';
+  }
+
+  return false;
+}
+
+async function logout(){
+  try{
+    await window._firebase.signOut(window._firebase.auth);
+  }catch(err){
+    console.error(err);
+  }
+  dashboardStarted = false;
   document.getElementById('admin-dashboard').classList.add('hidden');
   document.getElementById('login-screen').classList.remove('hidden');
   document.getElementById('admin-password').value = '';
@@ -414,28 +486,66 @@ function logout(){
 function showDashboard(){
   document.getElementById('login-screen').classList.add('hidden');
   document.getElementById('admin-dashboard').classList.remove('hidden');
+
+  if(dashboardStarted) return;
+  dashboardStarted = true;
+
   loadProducts();
   initChatsListener();
   initOrdersListener();
 }
 
-if(sessionStorage.getItem('em_admin_auth') === 'true'){
-  document.addEventListener('DOMContentLoaded', showDashboard);
+function showLogin(){
+  dashboardStarted = false;
+  document.getElementById('admin-dashboard').classList.add('hidden');
+  document.getElementById('login-screen').classList.remove('hidden');
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-  document.getElementById('p-image').addEventListener('change', function(e){
-    const file = e.target.files[0];
-    if(file){
-      selectedImageFile = file;
-      const reader = new FileReader();
-      reader.onload = function(ev){
-        document.getElementById('preview-img').src = ev.target.result;
-        document.getElementById('image-preview').classList.remove('hidden');
-      };
-      reader.readAsDataURL(file);
+function initAdminAuth(){
+  if(adminAuthInitialized) return;
+  adminAuthInitialized = true;
+
+  const { auth, onAuthStateChanged } = window._firebase;
+
+  onAuthStateChanged(auth, async (user) => {
+    if(!user){
+      showLogin();
+      return;
     }
+
+    if(!isAllowedAdmin(user)){
+      console.warn('Unauthorized Firebase account attempted admin access:', user.email);
+      try{ await signOut(auth); }catch(e){}
+      const errorEl = document.getElementById('login-error');
+      errorEl.textContent = 'This Firebase account is not authorized as an admin.';
+      errorEl.classList.remove('hidden');
+      showLogin();
+      return;
+    }
+
+    showDashboard();
   });
+}
+
+document.addEventListener('firebase-ready', initAdminAuth);
+if(window._firebaseReady) initAdminAuth();
+
+document.addEventListener('DOMContentLoaded', () => {
+  const imageInput = document.getElementById('p-image');
+  if(imageInput){
+    imageInput.addEventListener('change', function(e){
+      const file = e.target.files[0];
+      if(file){
+        selectedImageFile = file;
+        const reader = new FileReader();
+        reader.onload = function(ev){
+          document.getElementById('preview-img').src = ev.target.result;
+          document.getElementById('image-preview').classList.remove('hidden');
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+  }
 });
 
 function showToast(text, isError){
