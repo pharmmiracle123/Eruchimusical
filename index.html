@@ -46,11 +46,10 @@
     @keyframes slide { from { transform: translateX(100%); } to { transform: translateX(0); } }
     .product-img-ph { background: linear-gradient(135deg, rgba(30,58,138,.08), rgba(192,133,82,.15)); }
 
-    /* ===== Floating action buttons ===== */
+    /* ===== Floating action button ===== */
     .fab { position: fixed; z-index: 60; width: 60px; height: 60px; border-radius: 999px; display: flex; align-items: center; justify-content: center; font-size: 24px; box-shadow: 0 10px 25px rgba(0,0,0,.25); transition: transform .2s; }
     .fab:hover { transform: scale(1.07); }
     #support-fab { right: 20px; bottom: 20px; background: #1E3A8A; color: #fff; }
-    #whatsapp-fab { left: 20px; bottom: 20px; background: #25D366; color: #fff; }
     .fab-ping { position: absolute; inset: 0; border-radius: 999px; background: currentColor; opacity: .5; animation: fab-ping 2.2s cubic-bezier(0,0,.2,1) infinite; }
     @keyframes fab-ping { 75%, 100% { transform: scale(1.6); opacity: 0; } }
     .fab-badge { position: absolute; top: -4px; right: -4px; background: #DC2626; color: #fff; font-size: 10px; font-weight: 700; width: 18px; height: 18px; border-radius: 999px; display: flex; align-items: center; justify-content: center; }
@@ -65,6 +64,10 @@
     .scroll-row > * { scroll-snap-align: start; flex: 0 0 auto; }
     .scroll-row::-webkit-scrollbar { height: 6px; }
     .scroll-row::-webkit-scrollbar-thumb { background: #C08552; border-radius: 999px; }
+
+    .stock-badge { position: absolute; bottom: 2px; left: 2px; z-index: 10; background: #DC2626; color: #fff; font-size: 10px; padding: 2px 8px; border-radius: 6px; }
+    .qty-box { display: flex; align-items: center; gap: .5rem; }
+    .qty-box button { width: 32px; height: 32px; border: 1px solid #ddd; border-radius: 8px; background: #fff; }
   </style>
 </head>
 <body>
@@ -108,6 +111,7 @@
       </nav>
 
       <div class="flex items-center gap-5">
+        <button onclick="openOrderHistory()" class="relative" aria-label="My Orders">📦</button>
         <button onclick="openWishlist()" class="relative">
           ♡<span id="wishlist-count" class="absolute -top-2 -right-2 bg-navy text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">0</span>
         </button>
@@ -133,7 +137,7 @@
 
     <div class="bg-gold/10 border-t">
       <div class="max-w-7xl mx-auto px-5 py-4 flex">
-        <input id="search-input" oninput="filterProducts()" type="search"
+        <input id="search-input" oninput="debouncedFilter()" type="search"
           placeholder="Search keyboards, drums, Yamaha, PDP, Tama..."
           class="w-full rounded-l-lg border p-4 bg-white outline-none">
         <button class="bg-navy text-white px-7 rounded-r-lg">🔎</button>
@@ -242,7 +246,7 @@
   </section>
 
   <!-- ============================================================ -->
-  <!-- RECENTLY VIEWED (new — shows only once the visitor has viewed something) -->
+  <!-- RECENTLY VIEWED -->
   <!-- ============================================================ -->
   <section id="recently-viewed-section" class="py-12 bg-gold/5 hidden">
     <div class="max-w-7xl mx-auto px-5">
@@ -252,7 +256,7 @@
   </section>
 
   <!-- ============================================================ -->
-  <!-- TESTIMONIALS (new) -->
+  <!-- TESTIMONIALS -->
   <!-- SAMPLE CONTENT ONLY — replace with real customer reviews      -->
   <!-- before this page goes live. Edit the TESTIMONIALS array in   -->
   <!-- the script below.                                             -->
@@ -300,7 +304,7 @@
           <button class="w-full flex justify-between p-5 text-left font-semibold" onclick="toggleFaq(this)">
             Do you deliver nationwide?<i class="fa-solid fa-plus faq-icon"></i>
           </button>
-          <div class="faq-answer px-5"><p class="pb-5 text-gray-600">Yes, delivery is available across Nigeria.</p></div>
+          <div class="faq-answer px-5"><p class="pb-5 text-gray-600">Yes, delivery is available across Nigeria. A delivery fee is calculated at checkout based on your state.</p></div>
         </div>
 
         <div class="faq-item bg-white rounded-xl shadow">
@@ -314,7 +318,7 @@
           <button class="w-full flex justify-between p-5 text-left font-semibold" onclick="toggleFaq(this)">
             How do I reach customer support?<i class="fa-solid fa-plus faq-icon"></i>
           </button>
-          <div class="faq-answer px-5"><p class="pb-5 text-gray-600">Tap the blue support icon at the bottom of the screen to start a live chat, or message us directly on WhatsApp using the green icon.</p></div>
+          <div class="faq-answer px-5"><p class="pb-5 text-gray-600">Tap the blue support icon at the bottom of the screen to start a live chat with us.</p></div>
         </div>
 
       </div>
@@ -392,7 +396,6 @@
       <div>
         <h4 class="font-bold mb-4">Follow Us</h4>
         <div class="flex gap-5 text-2xl">
-          <a href="https://wa.me/2349138530296">🟢</a>
           <a href="https://www.tiktok.com/@emusical.instrume">♪</a>
           <a href="https://t.me/Sundayeruchi2000">✈</a>
         </div>
@@ -415,16 +418,63 @@
       </div>
       <div id="cart-items" class="flex-1 overflow-y-auto p-5"></div>
       <p id="cart-empty" class="text-center text-gray-500 p-10">Your cart is empty.</p>
-      <div id="cart-footer" class="border-t p-5 hidden">
+      <div id="cart-footer" class="border-t p-5 hidden overflow-y-auto" style="max-height:60vh">
         <div class="flex gap-2 mb-3">
           <input id="coupon-input" class="flex-1 border rounded-lg p-3" placeholder="Coupon code">
           <button onclick="applyCoupon()" class="bg-gold px-4 rounded-lg">Apply</button>
         </div>
         <p id="coupon-msg" class="text-sm hidden"></p>
+
+        <h4 class="font-bold mt-2 mb-2">Delivery Details</h4>
+        <input id="checkout-name" required placeholder="Full Name" class="w-full border rounded-lg p-3 mb-2">
+        <input id="checkout-phone" required placeholder="Phone Number" class="w-full border rounded-lg p-3 mb-2">
+        <input id="checkout-address" required placeholder="Delivery Address" class="w-full border rounded-lg p-3 mb-2">
+        <select id="checkout-state" required onchange="renderCart()" class="w-full border rounded-lg p-3 mb-2">
+          <option value="">Select Delivery State</option>
+          <option value="Lagos">Lagos</option>
+          <option value="Abuja (FCT)">Abuja (FCT)</option>
+          <option value="Ogun">Ogun</option>
+          <option value="Oyo">Oyo</option>
+          <option value="Osun">Osun</option>
+          <option value="Ondo">Ondo</option>
+          <option value="Ekiti">Ekiti</option>
+          <option value="Rivers">Rivers</option>
+          <option value="Delta">Delta</option>
+          <option value="Edo">Edo</option>
+          <option value="Akwa Ibom">Akwa Ibom</option>
+          <option value="Bayelsa">Bayelsa</option>
+          <option value="Cross River">Cross River</option>
+          <option value="Anambra">Anambra</option>
+          <option value="Enugu">Enugu</option>
+          <option value="Imo">Imo</option>
+          <option value="Abia">Abia</option>
+          <option value="Ebonyi">Ebonyi</option>
+          <option value="Kano">Kano</option>
+          <option value="Kaduna">Kaduna</option>
+          <option value="Katsina">Katsina</option>
+          <option value="Kebbi">Kebbi</option>
+          <option value="Sokoto">Sokoto</option>
+          <option value="Jigawa">Jigawa</option>
+          <option value="Zamfara">Zamfara</option>
+          <option value="Bauchi">Bauchi</option>
+          <option value="Borno">Borno</option>
+          <option value="Adamawa">Adamawa</option>
+          <option value="Gombe">Gombe</option>
+          <option value="Taraba">Taraba</option>
+          <option value="Yobe">Yobe</option>
+          <option value="Benue">Benue</option>
+          <option value="Kogi">Kogi</option>
+          <option value="Kwara">Kwara</option>
+          <option value="Nasarawa">Nasarawa</option>
+          <option value="Niger">Niger</option>
+          <option value="Plateau">Plateau</option>
+        </select>
+        <input id="checkout-email" type="email" required placeholder="Email for receipt" class="w-full border rounded-lg p-3 mb-3">
+
         <div class="flex justify-between"><span>Subtotal</span><b id="cart-subtotal">₦0</b></div>
         <div id="discount-row" class="hidden flex justify-between text-green-600"><span>Discount</span><b id="cart-discount">₦0</b></div>
+        <div class="flex justify-between"><span>Delivery Fee</span><b id="cart-delivery">₦0</b></div>
         <div class="flex justify-between text-xl font-bold mt-2 mb-4"><span>Total</span><span id="cart-total">₦0</span></div>
-        <input id="checkout-email" type="email" required placeholder="Email for receipt" class="w-full border rounded-lg p-3 mb-3">
         <button onclick="payWithPaystack()" class="w-full bg-navy text-white py-4 rounded-lg font-bold">🔒 Pay with Paystack</button>
       </div>
     </div>
@@ -438,6 +488,17 @@
       </div>
       <div id="wishlist-items" class="flex-1 overflow-y-auto p-5"></div>
       <p id="wishlist-empty" class="text-center text-gray-500 p-10">Your wishlist is empty.</p>
+    </div>
+  </div>
+
+  <div id="orders-modal" class="hidden fixed inset-0 z-[100] bg-black/50 flex justify-end">
+    <div class="modal-panel bg-white w-full max-w-md h-full flex flex-col">
+      <div class="p-5 bg-navy text-white flex justify-between">
+        <h3 class="text-xl font-bold">📦 My Orders</h3>
+        <button onclick="closeOrderHistory()" class="text-3xl">×</button>
+      </div>
+      <div id="orders-items" class="flex-1 overflow-y-auto p-5"></div>
+      <p id="orders-empty" class="text-center text-gray-500 p-10">No past orders on this device yet.</p>
     </div>
   </div>
 
@@ -459,7 +520,6 @@
           <input id="chat-input" class="flex-1 border rounded-lg p-3" placeholder="Type your message..." onkeydown="if(event.key==='Enter')sendChatMessage()">
           <button onclick="sendChatMessage()" class="bg-navy text-white px-5 rounded-lg">➤</button>
         </div>
-     
       </div>
     </div>
   </div>
@@ -469,7 +529,7 @@
   </div>
 
   <!-- ============================================================ -->
-  <!-- FLOATING ACTION BUTTONS (new) -->
+  <!-- FLOATING ACTION BUTTON -->
   <!-- ============================================================ -->
   <button id="support-fab" class="fab" onclick="openChat()" aria-label="Chat with Customer Support">
     <span class="fab-ping"></span>
@@ -515,9 +575,20 @@
     // CONFIG & STATE
     // ------------------------------------------------------------
     const PAYSTACK_PUBLIC_KEY = "pk_live_1360dbbf248bd92c3afcb1b2b9a132f13f941d83";
-    const WHATSAPP_NUMBER = "2349138530296";
+    const PAYSTACK_SUBACCOUNT = "ACCT_0r1hbtllzxiq7n9";
     const COUPONS = { MUSIC10: .10, YAMAHA5: .05 };
     const RECENTLY_VIEWED_MAX = 8;
+    const LOW_STOCK_THRESHOLD = 5;
+
+    // Delivery fee per state (₦). Adjust freely from the admin side later if needed.
+    const DELIVERY_FEES = {
+      "Lagos": 2000, "Ogun": 2500, "Oyo": 3000, "Osun": 3000, "Ondo": 3000, "Ekiti": 3000,
+      "Abuja (FCT)": 3500, "Benue": 4000, "Kogi": 4000, "Kwara": 3500, "Nasarawa": 4000, "Niger": 4000, "Plateau": 4000,
+      "Rivers": 3500, "Delta": 3500, "Edo": 3000, "Akwa Ibom": 4000, "Bayelsa": 4000, "Cross River": 4000,
+      "Anambra": 3500, "Enugu": 3500, "Imo": 3500, "Abia": 3500, "Ebonyi": 4000,
+      "Kano": 4500, "Kaduna": 4500, "Katsina": 5000, "Kebbi": 5000, "Sokoto": 5000, "Jigawa": 5000, "Zamfara": 5000,
+      "Bauchi": 4500, "Borno": 5500, "Adamawa": 5000, "Gombe": 4500, "Taraba": 4500, "Yobe": 5500
+    };
 
     // Sample testimonials — REPLACE with real customer reviews before publishing.
     const TESTIMONIALS = [
@@ -532,10 +603,12 @@
     let cart = JSON.parse(localStorage.getItem("em_cart") || "[]");
     let wishlist = JSON.parse(localStorage.getItem("em_wishlist") || "[]");
     let recentlyViewed = JSON.parse(localStorage.getItem("em_recently_viewed") || "[]");
+    let orderHistory = JSON.parse(localStorage.getItem("em_order_history") || "[]");
     let appliedDiscount = 0;
     let liveProducts = {};
     let productOrder = [];
     let chatUnsub = null;
+    let searchDebounceTimer = null;
 
     // ------------------------------------------------------------
     // HELPERS
@@ -556,6 +629,10 @@
     }
     function stars(n) {
       return "★".repeat(n) + "☆".repeat(5 - n);
+    }
+    function debouncedFilter() {
+      clearTimeout(searchDebounceTimer);
+      searchDebounceTimer = setTimeout(filterProducts, 250);
     }
 
     // ------------------------------------------------------------
@@ -615,6 +692,18 @@
     });
 
     // ------------------------------------------------------------
+    // STOCK HELPERS
+    // ------------------------------------------------------------
+    function stockOf(p) {
+      // If a product has no `stock` field at all, treat it as unlimited/unknown.
+      return (p.stock === undefined || p.stock === null || p.stock === "") ? null : Number(p.stock);
+    }
+    function isSoldOut(p) {
+      const s = stockOf(p);
+      return p.badge === "SOLD OUT" || s === 0;
+    }
+
+    // ------------------------------------------------------------
     // RENDER: PRODUCTS / BEST SELLERS / RECENTLY VIEWED / TESTIMONIALS
     // ------------------------------------------------------------
     function renderProducts() {
@@ -623,7 +712,9 @@
 
       productOrder.forEach(id => {
         const p = liveProducts[id];
-        const sold = p.badge === "SOLD OUT";
+        const sold = isSoldOut(p);
+        const s = stockOf(p);
+        const lowStock = !sold && s !== null && s <= LOW_STOCK_THRESHOLD;
         const c = document.createElement("div");
         c.className = "product bg-white rounded-xl shadow overflow-hidden border";
         c.dataset.id = id;
@@ -633,6 +724,7 @@
         c.innerHTML = `
           <div class="shine"></div>
           ${p.badge ? `<span class="absolute top-2 left-2 z-10 bg-navy text-white text-xs px-2 py-1 rounded">${esc(p.badge)}</span>` : ""}
+          ${lowStock ? `<span class="stock-badge">Only ${s} left!</span>` : ""}
           <button class="wishlist-heart absolute top-2 right-2 z-10 bg-white w-9 h-9 rounded-full" onclick="toggleWishlist(event,'${esc(id)}')">♡</button>
           <div class="h-44">${img(p)}</div>
           <div class="p-4">
@@ -643,7 +735,7 @@
             <div class="text-gold mt-2">★★★★★</div>
             <div class="flex gap-2 mt-3">
               <button onclick="quickView('${esc(id)}')" class="flex-1 border border-navy text-navy py-2 rounded-lg">View</button>
-              <button ${sold ? "disabled" : `onclick="addItem('${esc(id)}')"`} class="flex-1 ${sold ? "bg-gray-300" : "bg-navy text-white"} py-2 rounded-lg">${sold ? "Sold Out" : "Add"}</button>
+              <button ${sold ? "disabled" : `onclick="addItem('${esc(id)}',1)"`} class="flex-1 ${sold ? "bg-gray-300" : "bg-navy text-white"} py-2 rounded-lg">${sold ? "Sold Out" : "Add"}</button>
             </div>
           </div>`;
         g.appendChild(c);
@@ -730,12 +822,21 @@
     }
     function saveCart() { localStorage.setItem("em_cart", JSON.stringify(cart)); counts(); renderCart(); }
     function saveWish() { localStorage.setItem("em_wishlist", JSON.stringify(wishlist)); counts(); renderWishlist(); syncHearts(); }
+    function saveOrderHistory() { localStorage.setItem("em_order_history", JSON.stringify(orderHistory)); }
 
-    function addItem(id) {
+    function addItem(id, qty) {
+      qty = Math.max(1, Number(qty) || 1);
       const p = liveProducts[id];
-      if (!p || p.badge === "SOLD OUT") return;
+      if (!p || isSoldOut(p)) return;
+      const s = stockOf(p);
       const i = cart.find(x => x.id === id);
-      i ? i.qty++ : cart.push({ id, name: p.name, price: Number(p.price || 0), imageUrl: p.imageUrl || "", qty: 1 });
+      const currentQty = i ? i.qty : 0;
+      if (s !== null && currentQty + qty > s) {
+        qty = Math.max(0, s - currentQty);
+        if (qty <= 0) return toast("No more stock available for this item");
+        toast(`Only ${qty} more in stock — added ${qty}`);
+      }
+      i ? i.qty += qty : cart.push({ id, name: p.name, price: Number(p.price || 0), imageUrl: p.imageUrl || "", qty });
       saveCart();
       trackRecentlyViewed(id);
       toast("Added to cart");
@@ -749,7 +850,11 @@
       saveCart();
     }
     function sub() { return cart.reduce((s, i) => s + i.price * i.qty, 0); }
-    function total() { return Math.round(sub() * (1 - appliedDiscount)); }
+    function deliveryFee() {
+      const state = document.getElementById("checkout-state")?.value || "";
+      return DELIVERY_FEES[state] || 0;
+    }
+    function total() { return Math.round(sub() * (1 - appliedDiscount)) + deliveryFee(); }
 
     function renderCart() {
       const b = document.getElementById("cart-items");
@@ -787,6 +892,7 @@
       document.getElementById("cart-subtotal").textContent = naira(sub());
       document.getElementById("discount-row").classList.toggle("hidden", !appliedDiscount);
       document.getElementById("cart-discount").textContent = "-" + naira(sub() * appliedDiscount);
+      document.getElementById("cart-delivery").textContent = naira(deliveryFee());
       document.getElementById("cart-total").textContent = naira(total());
     }
 
@@ -830,12 +936,36 @@
         b.innerHTML += `<div class="flex gap-3 items-center border-b py-4">
           <div class="w-16 h-16">${img(p)}</div>
           <div class="flex-1"><b>${esc(p.name)}</b><p>${naira(p.price)}</p></div>
-          <button onclick="addItem('${esc(id)}')" class="bg-navy text-white px-3 py-2 rounded">Add</button>
+          <button onclick="addItem('${esc(id)}',1)" class="bg-navy text-white px-3 py-2 rounded">Add</button>
         </div>`;
       });
     }
     function openWishlist() { renderWishlist(); document.getElementById("wishlist-modal").classList.remove("hidden"); document.body.classList.add("overflow-hidden"); }
     function closeWishlist() { document.getElementById("wishlist-modal").classList.add("hidden"); document.body.classList.remove("overflow-hidden"); }
+
+    // ------------------------------------------------------------
+    // ORDER HISTORY (local device only — no login system)
+    // ------------------------------------------------------------
+    function renderOrderHistory() {
+      const b = document.getElementById("orders-items");
+      const e = document.getElementById("orders-empty");
+      e.classList.toggle("hidden", !!orderHistory.length);
+      b.innerHTML = [...orderHistory].reverse().map(o => `
+        <div class="border-b py-4">
+          <div class="flex justify-between text-sm text-gray-500">
+            <span>${new Date(o.createdAt).toLocaleString()}</span>
+            <span>Ref: ${esc(o.ref)}</span>
+          </div>
+          <ul class="text-sm mt-2 list-disc pl-5">
+            ${o.items.map(i => `<li>${esc(i.name)} x${i.qty}</li>`).join("")}
+          </ul>
+          <p class="text-navy font-bold mt-2">${naira(o.totalAmount)}</p>
+          <p class="text-xs text-gray-500">Delivering to: ${esc(o.deliveryState || "-")}</p>
+        </div>
+      `).join("");
+    }
+    function openOrderHistory() { renderOrderHistory(); document.getElementById("orders-modal").classList.remove("hidden"); document.body.classList.add("overflow-hidden"); }
+    function closeOrderHistory() { document.getElementById("orders-modal").classList.add("hidden"); document.body.classList.remove("overflow-hidden"); }
 
     // ------------------------------------------------------------
     // QUICK VIEW
@@ -844,24 +974,41 @@
       const p = liveProducts[id];
       if (!p) return;
       trackRecentlyViewed(id);
+      const sold = isSoldOut(p);
+      const s = stockOf(p);
       document.getElementById("quickview-content").innerHTML = `
         <div class="h-56 mb-5">${img(p)}</div>
         <h3 class="serif text-2xl font-bold">${esc(p.name)}</h3>
         <p class="text-navy font-bold text-2xl mt-3">${naira(p.price)}</p>
-        <button onclick="addItem('${esc(id)}');closeQuickView()" class="w-full mt-5 bg-navy text-white py-3 rounded-lg">Add to Cart</button>`;
+        ${s !== null ? `<p class="text-sm text-gray-500 mt-1">${sold ? "Out of stock" : s + " in stock"}</p>` : ""}
+        ${sold ? `
+          <button disabled class="w-full mt-5 bg-gray-300 py-3 rounded-lg">Sold Out</button>
+        ` : `
+          <div class="qty-box mt-5">
+            <button onclick="qvChangeQty(-1)">−</button>
+            <span id="qv-qty">1</span>
+            <button onclick="qvChangeQty(1)">+</button>
+          </div>
+          <button onclick="addItem('${esc(id)}', Number(document.getElementById('qv-qty').textContent)); closeQuickView()" class="w-full mt-4 bg-navy text-white py-3 rounded-lg">Add to Cart</button>
+        `}`;
       document.getElementById("quickview-modal").classList.remove("hidden");
+    }
+    function qvChangeQty(d) {
+      const el = document.getElementById("qv-qty");
+      const v = Math.max(1, Number(el.textContent) + d);
+      el.textContent = v;
     }
     function closeQuickView() { document.getElementById("quickview-modal").classList.add("hidden"); }
 
     // ------------------------------------------------------------
-    // CHECKOUT: PAYSTACK / WHATSAPP
+    // CHECKOUT: PAYSTACK
     // ------------------------------------------------------------
-    async function saveOrder(email, amount, items, ref) {
+    async function saveOrder(order) {
       if (!window._firebase) return;
       try {
         const { db, collection, addDoc, serverTimestamp } = window._firebase;
         await addDoc(collection(db, "orders"), {
-          items, customerEmail: email, totalAmount: amount, paystackRef: ref,
+          ...order,
           paymentStatus: "pending_verification", fulfillmentStatus: "pending",
           createdAt: serverTimestamp()
         });
@@ -870,7 +1017,15 @@
 
     function payWithPaystack() {
       if (!cart.length) return toast("Your cart is empty");
+
+      const name = document.getElementById("checkout-name").value.trim();
+      const phone = document.getElementById("checkout-phone").value.trim();
+      const address = document.getElementById("checkout-address").value.trim();
+      const state = document.getElementById("checkout-state").value;
       const email = document.getElementById("checkout-email").value.trim();
+
+      if (!name || !phone || !address) return toast("Please fill in your delivery details");
+      if (!state) return toast("Please select your delivery state");
       if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return toast("Enter a valid email");
 
       const ref = "EM-" + Date.now();
@@ -881,20 +1036,31 @@
 
       const h = PaystackPop.setup({
         key: PAYSTACK_PUBLIC_KEY,
+        subaccount: PAYSTACK_SUBACCOUNT,
         email,
         amount: amount * 100,
         currency: "NGN",
         ref,
         metadata: {
-          custom_fields: [{
-            display_name: "Order Items",
-            variable_name: "order_items",
-            value: cart.map(i => i.name + " x" + i.qty).join(", ")
-          }]
+          custom_fields: [
+            { display_name: "Order Items", variable_name: "order_items", value: cart.map(i => i.name + " x" + i.qty).join(", ") },
+            { display_name: "Customer Name", variable_name: "customer_name", value: name },
+            { display_name: "Phone", variable_name: "phone", value: phone },
+            { display_name: "Delivery Address", variable_name: "delivery_address", value: address + ", " + state }
+          ]
         },
         callback: async r => {
-          await saveOrder(email, amount, items, r.reference);
-          localStorage.setItem("em_last_order", JSON.stringify({ items, customerEmail: email, totalAmount: amount, paystackRef: r.reference }));
+          const order = {
+            items, customerName: name, customerPhone: phone, customerEmail: email,
+            deliveryAddress: address, deliveryState: state, deliveryFee: deliveryFee(),
+            totalAmount: amount, paystackRef: r.reference
+          };
+          await saveOrder(order);
+
+          orderHistory.push({ ...order, ref: r.reference, createdAt: Date.now() });
+          saveOrderHistory();
+
+          localStorage.setItem("em_last_order", JSON.stringify(order));
           cart = [];
           appliedDiscount = 0;
           saveCart();
@@ -904,19 +1070,6 @@
         onClose: () => toast("Payment window closed")
       });
       h.openIframe();
-    }
-
-    function orderViaWhatsapp() {
-      if (!cart.length) return toast("Your cart is empty");
-      const m = "Hello Eruchi Musicals, I would like to order:%0A"
-        + cart.map(i => "- " + i.name + " x" + i.qty + " (" + naira(i.price * i.qty) + ")").join("%0A")
-        + "%0A%0ATotal: " + naira(total());
-      window.open("https://wa.me/" + WHATSAPP_NUMBER + "?text=" + m, "_blank");
-    }
-
-    function openWhatsAppChat() {
-      const msg = "Hello Eruchi Musicals, I need help choosing or buying a musical instrument.";
-      window.open("https://wa.me/" + WHATSAPP_NUMBER + "?text=" + encodeURIComponent(msg), "_blank");
     }
 
     // ------------------------------------------------------------
@@ -931,7 +1084,7 @@
       document.getElementById("support-fab-badge").classList.add("hidden");
 
       if (!window._firebase) {
-        renderChat([{ sender: "admin", text: "Customer Care is connecting. You can also contact us on WhatsApp.", timestamp: Date.now() }]);
+        renderChat([{ sender: "admin", text: "Customer Care is connecting. Please try again shortly.", timestamp: Date.now() }]);
         return;
       }
 
@@ -951,12 +1104,12 @@
             }
           }, err => {
             console.error("Customer Care listener:", err);
-            renderChat([{ sender: "admin", text: "Live chat is temporarily unavailable. Please use WhatsApp below.", timestamp: Date.now() }]);
+            renderChat([{ sender: "admin", text: "Live chat is temporarily unavailable. Please try again later.", timestamp: Date.now() }]);
           });
         }
       } catch (err) {
         console.error("Customer Care:", err);
-        renderChat([{ sender: "admin", text: "We could not connect to live chat. Please use WhatsApp for immediate assistance.", timestamp: Date.now() }]);
+        renderChat([{ sender: "admin", text: "We could not connect to live chat. Please try again shortly.", timestamp: Date.now() }]);
       }
     }
 
@@ -1096,177 +1249,4 @@
     });
   </script>
 </body>
-</html><div id="firebase-status" class="hidden"></div><div id="loading-products" class="text-center py-16"><div class="spinner mx-auto"></div><p class="text-gray-500 mt-4">Loading products...</p></div><p id="no-results" class="hidden text-center text-gray-500 py-10">No products match your search.</p><p id="no-products" class="hidden text-center text-gray-500 py-10">New instruments are on the way.</p><div id="product-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"></div></div></section>
-<section id="bestsellers" class="py-16 bg-cream"><div class="max-w-7xl mx-auto px-5"><h2 class="serif text-3xl font-bold">🔥 Best Sellers</h2><p class="text-gray-500 mb-8">Popular instruments</p><div id="bestsellers-grid" class="grid grid-cols-2 md:grid-cols-3 gap-6"></div></div></section>
-<section id="about" class="py-20 bg-gold/5"><div class="max-w-7xl mx-auto px-5 text-center"><h2 class="serif text-4xl font-bold">Why Shop With Eruchi Musicals?</h2><p class="text-gray-600 mt-3 mb-12">Trusted by churches, schools, studios and musicians.</p><div class="grid md:grid-cols-4 gap-7"><div class="bg-white p-8 rounded-xl shadow">🎼<h3 class="font-bold text-xl">Genuine Brands</h3><p>Yamaha, PDP & Tama.</p></div><div class="bg-white p-8 rounded-xl shadow">🚚<h3 class="font-bold text-xl">Nationwide Delivery</h3><p>Secure delivery.</p></div><div class="bg-white p-8 rounded-xl shadow">💳<h3 class="font-bold text-xl">Secure Payments</h3><p>Card, Transfer or USSD.</p></div><div class="bg-white p-8 rounded-xl shadow">🛠️<h3 class="font-bold text-xl">Expert Support</h3><p>Setup and consultation.</p></div></div></div></section>
-<section id="faq" class="py-20 bg-gold/5"><div class="max-w-4xl mx-auto px-5"><h2 class="serif text-4xl font-bold text-center mb-12">Frequently Asked Questions</h2><div class="space-y-4">
-<div class="faq-item bg-white rounded-xl shadow"><button class="w-full flex justify-between p-5 text-left font-semibold" onclick="toggleFaq(this)">Are your instruments genuine?<i class="fa-solid fa-plus faq-icon"></i></button><div class="faq-answer px-5"><p class="pb-5 text-gray-600">Our listed Yamaha, PDP and Tama products are supplied as genuine products.</p></div></div>
-<div class="faq-item bg-white rounded-xl shadow"><button class="w-full flex justify-between p-5 text-left font-semibold" onclick="toggleFaq(this)">Do you deliver nationwide?<i class="fa-solid fa-plus faq-icon"></i></button><div class="faq-answer px-5"><p class="pb-5 text-gray-600">Yes, delivery is available across Nigeria.</p></div></div>
-<div class="faq-item bg-white rounded-xl shadow"><button class="w-full flex justify-between p-5 text-left font-semibold" onclick="toggleFaq(this)">What payment methods do you accept?<i class="fa-solid fa-plus faq-icon"></i></button><div class="faq-answer px-5"><p class="pb-5 text-gray-600">Paystack supports available Card, Bank Transfer and USSD methods.</p></div></div></div></div></section>
-<section id="contact" class="py-20 bg-cream"><div class="max-w-7xl mx-auto px-5"><h2 class="serif text-4xl font-bold text-center mb-12">Contact Eruchi Musicals</h2><div class="grid lg:grid-cols-2 gap-10">
-<div class="bg-white rounded-xl shadow p-8"><h3 class="text-2xl font-bold mb-6">Business Information</h3><div class="space-y-5"><p><b>Owner:</b> Sunday Eruchi</p><p><b>Motto</b> Excellent Music</p><p><b>Live Chat:</b> <button onclick="openChat()" class="text-navy underline">Start a chat</button></p><p><b>Country:</b> Nigeria</p></div></div>
-<div class="bg-white rounded-xl shadow p-8"><h3 class="text-2xl font-bold mb-6">Send Us A Message</h3><form onsubmit="sendContactMessage(event)" class="space-y-4"><input id="contact-name" required placeholder="Full Name" class="w-full border rounded-lg p-4"><input id="contact-email" type="email" required placeholder="Email Address" class="w-full border rounded-lg p-4"><input id="contact-phone" placeholder="Phone Number" class="w-full border rounded-lg p-4"><select id="contact-product-select" class="w-full border rounded-lg p-4"><option>Select Product</option></select><textarea id="contact-message" required rows="5" placeholder="Type your message..." class="w-full border rounded-lg p-4"></textarea><button class="w-full bg-navy text-white py-4 rounded-lg font-bold">Send Message</button></form></div></div></div></section>
-<section class="py-14 bg-navy text-center"><h2 class="serif text-3xl font-bold text-white">Subscribe To Our Newsletter</h2><form onsubmit="subscribeNewsletter(event)" class="max-w-xl mx-auto flex mt-6 gap-3 px-5"><input id="newsletter-email" required type="email" placeholder="Email address" class="flex-1 rounded-lg p-4"><button class="bg-gold text-charcoal font-bold px-7 rounded-lg">Subscribe</button></form></section>
-<footer class="bg-charcoal text-white"><div class="max-w-7xl mx-auto px-5 py-14 grid md:grid-cols-4 gap-10"><div><h3 class="serif text-2xl font-bold">Eruchi Musicals</h3><p class="mt-3 text-gray-400">Your one-stop shop for genuine musical instruments.</p></div><div><h4 class="font-bold mb-4">Quick Links</h4><div class="space-y-2"><a class="block" href="#home">Home</a><a class="block" href="#products">Shop</a><a class="block" href="#contact">Contact</a></div></div><div><h4 class="font-bold mb-4">Customer Care | Powered by Miracardiac</h4><a href="#faq">FAQs</a></div><div><h4 class="font-bold mb-4">Follow Us</h4><div class="flex gap-5 text-2xl"><a href="https://wa.me/2349138530296">🟢</a><a href="https://www.tiktok.com/@emusical.instrume">♪</a><a href="https://t.me/Sundayeruchi2000">✈</a></div></div></div><div class="border-t border-gray-700 text-center text-gray-400 py-6">© 2026 Eruchi Musicals. All Rights Reserved.<br>Website Developer by Miracle | +234 915 531 1480</div></footer>
-
-<div id="cart-modal" class="hidden fixed inset-0 z-[100] bg-black/50 flex justify-end"><div class="modal-panel bg-white w-full max-w-md h-full flex flex-col"><div class="p-5 bg-navy text-white flex justify-between"><h3 class="text-xl font-bold">🛍 Your Cart</h3><button onclick="closeCart()" class="text-3xl">×</button></div><div id="cart-items" class="flex-1 overflow-y-auto p-5"></div><p id="cart-empty" class="text-center text-gray-500 p-10">Your cart is empty.</p><div id="cart-footer" class="border-t p-5 hidden"><div class="flex gap-2 mb-3"><input id="coupon-input" class="flex-1 border rounded-lg p-3" placeholder="Coupon code"><button onclick="applyCoupon()" class="bg-gold px-4 rounded-lg">Apply</button></div><p id="coupon-msg" class="text-sm hidden"></p><div class="flex justify-between"><span>Subtotal</span><b id="cart-subtotal">₦0</b></div><div id="discount-row" class="hidden flex justify-between text-green-600"><span>Discount</span><b id="cart-discount">₦0</b></div><div class="flex justify-between text-xl font-bold mt-2 mb-4"><span>Total</span><span id="cart-total">₦0</span></div><input id="checkout-email" type="email" required placeholder="Email for receipt" class="w-full border rounded-lg p-3 mb-3"><button onclick="payWithPaystack()" class="w-full bg-navy text-white py-4 rounded-lg font-bold">🔒 Pay with Paystack</button><button onclick="orderViaWhatsapp()" class="w-full mt-3 bg-green-600 text-white py-4 rounded-lg font-bold">WhatsApp Order</button></div></div></div>
-<div id="wishlist-modal" class="hidden fixed inset-0 z-[100] bg-black/50 flex justify-end"><div class="modal-panel bg-white w-full max-w-md h-full flex flex-col"><div class="p-5 bg-navy text-white flex justify-between"><h3 class="text-xl font-bold">❤️ Wishlist</h3><button onclick="closeWishlist()" class="text-3xl">×</button></div><div id="wishlist-items" class="flex-1 overflow-y-auto p-5"></div><p id="wishlist-empty" class="text-center text-gray-500 p-10">Your wishlist is empty.</p></div></div>
-<div id="quickview-modal" class="hidden fixed inset-0 z-[110] bg-black/60 flex items-center justify-center p-5"><div class="bg-white rounded-2xl max-w-md w-full overflow-hidden"><div id="quickview-content" class="p-6"></div></div></div>
-<div id="chat-modal" class="hidden fixed inset-0 z-[130] bg-black/50 flex justify-end"><div class="modal-panel bg-white w-full max-w-md h-full flex flex-col"><div class="p-5 bg-navy text-white flex justify-between"><h3 class="text-xl font-bold">🎧Customer Care | Powered by Miracardiac</h3><button onclick="closeChat()" class="text-3xl">×</button></div><div id="chat-messages" class="flex-1 overflow-y-auto p-5 space-y-3"></div><div class="border-t p-4"><div class="flex gap-2"><input id="chat-input" class="flex-1 border rounded-lg p-3" placeholder="Type your message..." onkeydown="if(event.key==='Enter')sendChatMessage()"><button onclick="sendChatMessage()" class="bg-navy text-white px-5 rounded-lg">➤</button></div></div></div>
-<div id="toast" class="hidden fixed bottom-6 left-6 z-[200] bg-charcoal text-white px-5 py-3 rounded-lg shadow-lg"><span id="toast-text"></span></div>
-
-<script type="module">
-import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import{getFirestore,collection,onSnapshot,query,orderBy,doc,setDoc,updateDoc,arrayUnion,serverTimestamp,addDoc}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-const firebaseConfig={apiKey:"AIzaSyDC49oGcE3EAXSjjJ1mstpowbpjaaY8PTc",authDomain:"mcode-sales.firebaseapp.com",projectId:"mcode-sales",storageBucket:"mcode-sales.appspot.com",messagingSenderId:"823876737976",appId:"1:823876737976:web:45245a0fef4f5094dd0d4d"};
-const app=initializeApp(firebaseConfig),db=getFirestore(app);
-window._firebase={db,collection,onSnapshot,query,orderBy,doc,setDoc,updateDoc,arrayUnion,serverTimestamp,addDoc};
-window.dispatchEvent(new Event("firebase-ready"));
-</script>
-
-<script>
-const PAYSTACK_PUBLIC_KEY="pk_live_1360dbbf248bd92c3afcb1b2b9a132f13f941d83";
-const PAYSTACK_SUBACCOUNT="",WHATSAPP_NUMBER="2349138530296",COUPONS={MUSIC10:.10,YAMAHA5:.05};
-let cart=JSON.parse(localStorage.getItem("em_cart")||"[]"),wishlist=JSON.parse(localStorage.getItem("em_wishlist")||"[]"),appliedDiscount=0,liveProducts={},productOrder=[],chatUnsub=null;
-const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])),naira=n=>"₦"+Number(n||0).toLocaleString("en-NG");
-function img(p){return p.imageUrl?`<img src="${esc(p.imageUrl)}" class="w-full h-full object-cover" loading="lazy">`:`<div class="w-full h-full flex items-center justify-center product-img-ph">🎹</div>`}
-window.addEventListener("firebase-ready",()=>{
-  const f=window._firebase;
-  const loading=document.getElementById("loading-products");
-  const empty=document.getElementById("no-products");
-  const status=document.getElementById("firebase-status");
-  loading.classList.remove("hidden");
-
-  // IMPORTANT: Do NOT require createdAt. Products created by older versions
-  // of the admin dashboard may not contain that field.
-  try{
-    f.onSnapshot(f.collection(f.db,"products"),snap=>{
-      loading.classList.add("hidden");
-      liveProducts={};
-      productOrder=[];
-
-      snap.forEach(s=>{
-        const p=s.data()||{};
-        liveProducts[s.id]=p;
-        productOrder.push(s.id);
-      });
-
-      // Sort safely in JavaScript. Missing createdAt is allowed.
-      productOrder.sort((a,b)=>{
-        const ta=liveProducts[a].createdAt?.seconds || liveProducts[a].createdAt || 0;
-        const tb=liveProducts[b].createdAt?.seconds || liveProducts[b].createdAt || 0;
-        return Number(tb)-Number(ta);
-      });
-
-      empty.classList.toggle("hidden",productOrder.length>0);
-      renderProducts();
-      renderBest();
-      renderContact();
-      renderWishlist();
-
-      status.className="mb-5 rounded-lg p-3 text-sm bg-green-50 text-green-700";
-      status.innerHTML=`<i class="fa-solid fa-circle-check mr-2"></i>${productOrder.length} product${productOrder.length===1?"":"s"} loaded from Firestore.`;
-      status.classList.remove("hidden");
-      setTimeout(()=>status.classList.add("hidden"),3500);
-    },err=>{
-      console.error("Firestore products error:",err);
-      loading.classList.add("hidden");
-      empty.classList.remove("hidden");
-      status.className="mb-5 rounded-lg p-4 text-sm bg-red-50 text-red-700";
-      status.innerHTML=`<b>Product catalogue connection failed.</b><br><span class="text-xs">Check Firebase Firestore rules and make sure your products are in the <b>products</b> collection. Error: ${esc(err.message||err)}</span>`;
-      status.classList.remove("hidden");
-    });
-  }catch(err){
-    console.error(err);
-    loading.classList.add("hidden");
-    empty.classList.remove("hidden");
-  }
-});
-function renderProducts(){let g=document.getElementById("product-grid");g.innerHTML="";productOrder.forEach(id=>{let p=liveProducts[id],sold=p.badge==="SOLD OUT",c=document.createElement("div");c.className="product bg-white rounded-xl shadow overflow-hidden border";c.dataset.id=id;c.dataset.category=p.category||"other";c.dataset.name=(p.name||"").toLowerCase();c.dataset.price=Number(p.price||0);c.innerHTML=`<div class="shine"></div>${p.badge?`<span class="absolute top-2 left-2 z-10 bg-navy text-white text-xs px-2 py-1 rounded">${esc(p.badge)}</span>`:""}<button class="wishlist-heart absolute top-2 right-2 z-10 bg-white w-9 h-9 rounded-full" onclick="toggleWishlist(event,'${esc(id)}')">♡</button><div class="h-44">${img(p)}</div><div class="p-4"><h3 class="font-semibold">${esc(p.name)}</h3><p class="text-xs text-gray-500 mt-1">${esc(p.size||"")}</p>${p.notes?`<p class="text-xs text-gray-500">${esc(p.notes)}</p>`:""}<p class="text-navy font-bold text-xl mt-2">${naira(p.price)}</p><div class="text-gold mt-2">★★★★★</div><div class="flex gap-2 mt-3"><button onclick="quickView('${esc(id)}')" class="flex-1 border border-navy text-navy py-2 rounded-lg">View</button><button ${sold?"disabled":`onclick="addItem('${esc(id)}')"`} class="flex-1 ${sold?"bg-gray-300":"bg-navy text-white"} py-2 rounded-lg">${sold?"Sold Out":"Add"}</button></div></div>`;g.appendChild(c)});syncHearts();filterProducts();sortProducts()}
-function renderBest(){let g=document.getElementById("bestsellers-grid"),ids=productOrder.filter(id=>["BEST SELLER","HOT DEAL","NEW","NEW ARRIVAL"].includes(liveProducts[id].badge)).slice(0,3);if(!ids.length)ids=productOrder.slice(0,3);g.innerHTML=ids.length?ids.map(id=>{let p=liveProducts[id];return`<div class="bg-white rounded-xl shadow overflow-hidden"><div class="h-48">${img(p)}</div><div class="p-5"><h3 class="font-bold">${esc(p.name)}</h3><p class="text-navy font-bold text-2xl">${naira(p.price)}</p></div></div>`}).join(""):'<p class="col-span-full text-center text-gray-400">Best sellers will appear here once products are added.</p>'}
-function renderContact(){document.getElementById("contact-product-select").innerHTML='<option>Select Product</option>'+productOrder.map(id=>`<option>${esc(liveProducts[id].name)}</option>`).join("")}
-function counts(){document.getElementById("cart-count").textContent=cart.reduce((s,i)=>s+i.qty,0);document.getElementById("wishlist-count").textContent=wishlist.length}
-function saveCart(){localStorage.setItem("em_cart",JSON.stringify(cart));counts();renderCart()}function saveWish(){localStorage.setItem("em_wishlist",JSON.stringify(wishlist));counts();renderWishlist();syncHearts()}
-function addItem(id){let p=liveProducts[id];if(!p||p.badge==="SOLD OUT")return;let i=cart.find(x=>x.id===id);i?i.qty++:cart.push({id,name:p.name,price:Number(p.price||0),imageUrl:p.imageUrl||"",qty:1});saveCart();toast("Added to cart")}
-function removeFromCart(id){cart=cart.filter(i=>i.id!==id);saveCart()}function qty(id,d){let i=cart.find(x=>x.id===id);if(!i)return;i.qty+=d;if(i.qty<1)return removeFromCart(id);saveCart()}
-function sub(){return cart.reduce((s,i)=>s+i.price*i.qty,0)}function total(){return Math.round(sub()*(1-appliedDiscount))}
-function renderCart(){let b=document.getElementById("cart-items"),e=document.getElementById("cart-empty"),f=document.getElementById("cart-footer");b.innerHTML="";if(!cart.length){e.classList.remove("hidden");f.classList.add("hidden");return}e.classList.add("hidden");f.classList.remove("hidden");cart.forEach(i=>{let r=document.createElement("div");r.className="flex gap-3 items-center border-b py-4";r.innerHTML=`<div class="w-16 h-16 overflow-hidden rounded">${i.imageUrl?`<img src="${esc(i.imageUrl)}" class="w-full h-full object-cover">`:"🎹"}</div><div class="flex-1"><b>${esc(i.name)}</b><p class="text-navy font-bold">${naira(i.price)}</p><div class="flex gap-2 mt-2"><button onclick="qty('${esc(i.id)}',-1)" class="border px-2">−</button><span>${i.qty}</span><button onclick="qty('${esc(i.id)}',1)" class="border px-2">+</button><button onclick="removeFromCart('${esc(i.id)}')" class="text-red-600">🗑</button></div></div><b>${naira(i.price*i.qty)}</b>`;b.appendChild(r)});document.getElementById("cart-subtotal").textContent=naira(sub());document.getElementById("discount-row").classList.toggle("hidden",!appliedDiscount);document.getElementById("cart-discount").textContent="-"+naira(sub()*appliedDiscount);document.getElementById("cart-total").textContent=naira(total())}
-function openCart(){renderCart();document.getElementById("cart-modal").classList.remove("hidden");document.body.classList.add("overflow-hidden")}function closeCart(){document.getElementById("cart-modal").classList.add("hidden");document.body.classList.remove("overflow-hidden")}
-function applyCoupon(){let c=document.getElementById("coupon-input").value.trim().toUpperCase(),m=document.getElementById("coupon-msg");appliedDiscount=COUPONS[c]||0;m.textContent=appliedDiscount?"Coupon applied":"Invalid coupon";m.className="text-sm "+(appliedDiscount?"text-green-600":"text-red-600");m.classList.remove("hidden");renderCart()}
-function toggleWishlist(e,id){e.stopPropagation();let i=wishlist.indexOf(id);i<0?wishlist.push(id):wishlist.splice(i,1);saveWish()}function syncHearts(){document.querySelectorAll(".wishlist-heart").forEach(b=>{let on=wishlist.includes(b.closest(".product").dataset.id);b.textContent=on?"♥":"♡";b.classList.toggle("text-navy",on)})}
-function renderWishlist(){let b=document.getElementById("wishlist-items"),e=document.getElementById("wishlist-empty");b.innerHTML="";let ids=wishlist.filter(id=>liveProducts[id]);e.classList.toggle("hidden",!!ids.length);ids.forEach(id=>{let p=liveProducts[id];b.innerHTML+=`<div class="flex gap-3 items-center border-b py-4"><div class="w-16 h-16">${img(p)}</div><div class="flex-1"><b>${esc(p.name)}</b><p>${naira(p.price)}</p></div><button onclick="addItem('${esc(id)}')" class="bg-navy text-white px-3 py-2 rounded">Add</button></div>`})}
-function openWishlist(){renderWishlist();document.getElementById("wishlist-modal").classList.remove("hidden");document.body.classList.add("overflow-hidden")}function closeWishlist(){document.getElementById("wishlist-modal").classList.add("hidden");document.body.classList.remove("overflow-hidden")}
-function quickView(id){let p=liveProducts[id];if(!p)return;document.getElementById("quickview-content").innerHTML=`<div class="h-56 mb-5">${img(p)}</div><h3 class="serif text-2xl font-bold">${esc(p.name)}</h3><p class="text-navy font-bold text-2xl mt-3">${naira(p.price)}</p><button onclick="addItem('${esc(id)}');closeQuickView()" class="w-full mt-5 bg-navy text-white py-3 rounded-lg">Add to Cart</button>`;document.getElementById("quickview-modal").classList.remove("hidden")}function closeQuickView(){document.getElementById("quickview-modal").classList.add("hidden")}
-async function saveOrder(email,amount,items,ref){if(!window._firebase)return;try{let{db,collection,addDoc,serverTimestamp}=window._firebase;await addDoc(collection(db,"orders"),{items,customerEmail:email,totalAmount:amount,paystackRef:ref,paymentStatus:"pending_verification",fulfillmentStatus:"pending",createdAt:serverTimestamp()})}catch(e){console.error(e)}}
-function payWithPaystack(){if(!cart.length)return toast("Your cart is empty");let email=document.getElementById("checkout-email").value.trim();if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email))return toast("Enter a valid email");let ref="EM-"+Date.now(),items=cart.map(i=>({name:i.name,price:i.price,qty:i.qty,imageUrl:i.imageUrl||""})),amount=total();if(!window.PaystackPop)return toast("Paystack failed to load");let h=PaystackPop.setup({key:PAYSTACK_PUBLIC_KEY,email,amount:amount*100,currency:"NGN",ref,metadata:{custom_fields:[{display_name:"Order Items",variable_name:"order_items",value:cart.map(i=>i.name+" x"+i.qty).join(", ")}]},callback:async r=>{await saveOrder(email,amount,items,r.reference);localStorage.setItem("em_last_order",JSON.stringify({items,customerEmail:email,totalAmount:amount,paystackRef:r.reference}));cart=[];appliedDiscount=0;saveCart();closeCart();location.href="success.html?ref="+encodeURIComponent(r.reference)},onClose:()=>toast("Payment window closed")});h.openIframe()}
-function orderViaWhatsapp(){if(!cart.length)return toast("Your cart is empty");let m="Hello Eruchi Musicals, I would like to order:%0A"+cart.map(i=>"- "+i.name+" x"+i.qty+" ("+naira(i.price*i.qty)+")").join("%0A")+"%0A%0ATotal: "+naira(total());window.open("https://wa.me/"+WHATSAPP_NUMBER+"?text="+m,"_blank")}
-let chatSessionId=localStorage.getItem("em_chat_session")||("sess_"+Date.now()+"_"+Math.random().toString(36).slice(2));localStorage.setItem("em_chat_session",chatSessionId);
-async function openChat(){
-  document.getElementById("chat-modal").classList.remove("hidden");
-  document.body.classList.add("overflow-hidden");
-
-  if(!window._firebase){
-    renderChat([{sender:"admin",text:"Customer Care is connecting. You can also contact us on WhatsApp.",timestamp:Date.now()}]);
-    return;
-  }
-
-  const f=window._firebase;
-  const r=f.doc(f.db,"chats",chatSessionId);
-
-  try{
-    await f.setDoc(r,{
-      createdAt:f.serverTimestamp(),
-      lastMessageAt:f.serverTimestamp(),
-      unreadByCustomer:false
-    },{merge:true});
-
-    if(!chatUnsub){
-      chatUnsub=f.onSnapshot(r,s=>{
-        if(!s.exists())return;
-        const d=s.data()||{};
-        renderChat(d.messages||[]);
-        if(d.unreadByCustomer){
-          f.setDoc(r,{unreadByCustomer:false},{merge:true}).catch(()=>{});
-        }
-      },err=>{
-        console.error("Customer Care listener:",err);
-        renderChat([{sender:"admin",text:"Live chat is temporarily unavailable. Please use WhatsApp below.",timestamp:Date.now()}]);
-      });
-    }
-  }catch(err){
-    console.error("Customer Care:",err);
-    renderChat([{sender:"admin",text:"We could not connect to live chat. Please use WhatsApp for immediate assistance.",timestamp:Date.now()}]);
-  }
-}
-function renderChat(ms){let c=document.getElementById("chat-messages");c.innerHTML=ms.length?ms.map(m=>`<div class="flex ${m.sender==="admin"?"justify-start":"justify-end"}"><div class="max-w-[78%] ${m.sender==="admin"?"bg-gold/20":"bg-navy text-white"} rounded-xl px-4 py-2">${esc(m.text)}</div></div>`).join(""):'<p class="text-center text-gray-400">Send us a message and we will reply here shortly.</p>';c.scrollTop=c.scrollHeight}
-async function sendChatMessage(){let i=document.getElementById("chat-input"),t=i.value.trim();if(!t||!window._firebase)return;let{db,doc,setDoc,arrayUnion,serverTimestamp}=window._firebase;try{await setDoc(doc(db,"chats",chatSessionId),{createdAt:serverTimestamp(),messages:arrayUnion({sender:"customer",text:t,timestamp:Date.now()}),lastMessageAt:serverTimestamp(),unreadByAdmin:true},{merge:true});i.value=""}catch(e){toast("Could not send message")}}
-function openWhatsAppChat(){
-  const msg="Hello Eruchi Musicals, I need help choosing or buying a musical instrument.";
-  window.open("https://wa.me/"+WHATSAPP_NUMBER+"?text="+encodeURIComponent(msg),"_blank");
-}
-function closeChat(){document.getElementById("chat-modal").classList.add("hidden");document.body.classList.remove("overflow-hidden")}
-async function sendContactMessage(e){e.preventDefault();if(!window._firebase)return toast("Service unavailable");try{let{db,collection,addDoc,serverTimestamp}=window._firebase;await addDoc(collection(db,"contactMessages"),{name:document.getElementById("contact-name").value.trim(),email:document.getElementById("contact-email").value.trim(),phone:document.getElementById("contact-phone").value.trim(),product:document.getElementById("contact-product-select").value,message:document.getElementById("contact-message").value.trim(),createdAt:serverTimestamp()});e.target.reset();toast("Message sent successfully")}catch(e){console.error(e);toast("Could not send message")}}
-async function subscribeNewsletter(e){e.preventDefault();try{let{db,collection,addDoc,serverTimestamp}=window._firebase;await addDoc(collection(db,"newsletter"),{email:document.getElementById("newsletter-email").value.trim(),createdAt:serverTimestamp()});e.target.reset();toast("Subscribed successfully")}catch(e){toast("Could not subscribe")}}
-let activeCategory="all";
-function filterProducts(){
-  const q=document.getElementById("search-input").value.toLowerCase().trim();
-  let count=0;
-  document.querySelectorAll("#product-grid .product").forEach(p=>{
-    const categoryOk=activeCategory==="all" || (p.dataset.category||"").toLowerCase()===activeCategory;
-    const searchOk=!q || (p.dataset.name||"").includes(q) || (p.dataset.category||"").toLowerCase().includes(q);
-    const ok=categoryOk && searchOk;
-    p.classList.toggle("hidden",!ok);
-    if(ok)count++;
-  });
-  document.getElementById("no-results").classList.toggle("hidden",count>0||productOrder.length===0);
-}
-function filterByCategory(cat){
-  activeCategory=cat;
-  filterProducts();
-  document.getElementById("products").scrollIntoView({behavior:"smooth"});
-}
-function sortProducts(){let v=document.getElementById("sort-select").value,g=document.getElementById("product-grid"),a=[...g.querySelectorAll(".product")];if(v==="low-high")a.sort((x,y)=>+x.dataset.price-+y.dataset.price);if(v==="high-low")a.sort((x,y)=>+y.dataset.price-+x.dataset.price);a.forEach(x=>g.appendChild(x))}
-function toggleFaq(b){let i=b.closest(".faq-item"),o=i.classList.contains("open");document.querySelectorAll(".faq-item").forEach(x=>x.classList.remove("open"));if(!o)i.classList.add("open")}
-function toggleMobileMenu(){let m=document.getElementById("mobile-menu");m.style.maxHeight=m.style.maxHeight&&m.style.maxHeight!=="0px"?"0px":m.scrollHeight+"px"}function toast(t){let x=document.getElementById("toast");document.getElementById("toast-text").textContent=t;x.classList.remove("hidden");clearTimeout(window._toast);window._toast=setTimeout(()=>x.classList.add("hidden"),2500)}
-document.addEventListener("DOMContentLoaded",()=>{counts();renderCart();renderWishlist()});
-</script></body></html>
+</html>
