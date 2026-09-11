@@ -120,21 +120,14 @@ body{background:#F5F7FB;}
 
 <body class="text-charcoal min-h-screen">
 
-<!-- ===================== LOGIN SCREEN ===================== -->
-<div id="login-screen" class="min-h-screen flex items-center justify-center px-5">
-  <div class="bg-white rounded-2xl shadow-xl p-8 max-w-sm w-full border border-gold/30">
-    <h1 class="serif text-3xl font-bold text-center mb-1">Eruchi Musicals</h1>
-    <p class="text-center text-sm text-navy uppercase tracking-widest mb-8">Admin Access</p>
-    <form id="admin-login-form" onsubmit="return checkPassword(event)">
-      <input type="email" id="admin-email" placeholder="Admin email" autocomplete="username" required
-        class="w-full border border-gold/40 rounded-lg p-4 mb-3 outline-none focus:border-navy">
-      <input type="password" id="admin-password" placeholder="Password" autocomplete="current-password" required
-        class="w-full border border-gold/40 rounded-lg p-4 mb-4 outline-none focus:border-navy">
-      <button type="submit" id="login-btn" class="w-full bg-navy text-white py-4 rounded-lg font-bold hover:bg-black transition">
-        Log In
-      </button>
-    </form>
-    <p id="login-error" class="text-red-600 text-sm text-center mt-4 hidden"></p>
+<!-- ===================== AUTH CHECK SCREEN ===================== -->
+<!-- Shown briefly while Firebase resolves auth state. If the user
+     isn't signed in (or isn't an allowed admin), they're redirected
+     to login.html — this page no longer has its own login form. -->
+<div id="auth-check-screen" class="min-h-screen flex items-center justify-center">
+  <div class="text-center">
+    <div class="spinner mx-auto"></div>
+    <p class="text-gray-500 mt-3 text-sm">Checking access...</p>
   </div>
 </div>
 
@@ -394,7 +387,8 @@ body{background:#F5F7FB;}
 // ============================================================
 // These emails must also be the admin emails allowed in your
 // Firestore Security Rules. Create these accounts in Firebase
-// Authentication > Users.
+// Authentication > Users. The actual sign-in form lives in
+// login.html — this page only checks the resulting auth state.
 const ADMIN_EMAILS = [
   "onyekamiracle08@gmail.com",
   "emusic20official@gmail.com"
@@ -421,54 +415,8 @@ function isAllowedAdmin(user){
   return !!user && ADMIN_EMAILS.includes(normalizeEmail(user.email));
 }
 
-async function checkPassword(event){
-  if(event) event.preventDefault();
-
-  const email = normalizeEmail(document.getElementById('admin-email').value);
-  const password = document.getElementById('admin-password').value;
-  const errorEl = document.getElementById('login-error');
-  const loginBtn = document.getElementById('login-btn');
-
-  errorEl.classList.add('hidden');
-  errorEl.textContent = '';
-
-  if(!email || !password){
-    errorEl.textContent = 'Enter your admin email and password.';
-    errorEl.classList.remove('hidden');
-    return false;
-  }
-
-  if(!ADMIN_EMAILS.includes(email)){
-    errorEl.textContent = 'This email is not authorized for admin access.';
-    errorEl.classList.remove('hidden');
-    return false;
-  }
-
-  loginBtn.disabled = true;
-  loginBtn.textContent = 'Signing in...';
-
-  try{
-    const { auth, signInWithEmailAndPassword } = window._firebase;
-    await signInWithEmailAndPassword(auth, email, password);
-    // onAuthStateChanged performs the final authorization check.
-  }catch(err){
-    console.error(err);
-    let message = 'Login failed. Please check your email and password.';
-    if(err.code === 'auth/invalid-credential' || err.code === 'auth/wrong-password' || err.code === 'auth/user-not-found'){
-      message = 'Invalid admin email or password.';
-    }else if(err.code === 'auth/too-many-requests'){
-      message = 'Too many attempts. Please wait and try again.';
-    }else if(err.code === 'auth/network-request-failed'){
-      message = 'Network error. Check your internet connection.';
-    }
-    errorEl.textContent = message;
-    errorEl.classList.remove('hidden');
-  }finally{
-    loginBtn.disabled = false;
-    loginBtn.textContent = 'Log In';
-  }
-
-  return false;
+function redirectToLogin(){
+  window.location.href = 'login.html';
 }
 
 async function logout(){
@@ -478,13 +426,11 @@ async function logout(){
     console.error(err);
   }
   dashboardStarted = false;
-  document.getElementById('admin-dashboard').classList.add('hidden');
-  document.getElementById('login-screen').classList.remove('hidden');
-  document.getElementById('admin-password').value = '';
+  redirectToLogin();
 }
 
 function showDashboard(){
-  document.getElementById('login-screen').classList.add('hidden');
+  document.getElementById('auth-check-screen').classList.add('hidden');
   document.getElementById('admin-dashboard').classList.remove('hidden');
 
   if(dashboardStarted) return;
@@ -495,31 +441,22 @@ function showDashboard(){
   initOrdersListener();
 }
 
-function showLogin(){
-  dashboardStarted = false;
-  document.getElementById('admin-dashboard').classList.add('hidden');
-  document.getElementById('login-screen').classList.remove('hidden');
-}
-
 function initAdminAuth(){
   if(adminAuthInitialized) return;
   adminAuthInitialized = true;
 
-  const { auth, onAuthStateChanged } = window._firebase;
+  const { auth, onAuthStateChanged, signOut } = window._firebase;
 
   onAuthStateChanged(auth, async (user) => {
     if(!user){
-      showLogin();
+      redirectToLogin();
       return;
     }
 
     if(!isAllowedAdmin(user)){
       console.warn('Unauthorized Firebase account attempted admin access:', user.email);
       try{ await signOut(auth); }catch(e){}
-      const errorEl = document.getElementById('login-error');
-      errorEl.textContent = 'This Firebase account is not authorized as an admin.';
-      errorEl.classList.remove('hidden');
-      showLogin();
+      redirectToLogin();
       return;
     }
 
